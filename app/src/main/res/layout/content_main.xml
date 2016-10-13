@@ -40,7 +40,6 @@
                        android:id="@+id/recycler"
                        android:layout_width="match_parent"
                        android:layout_height="match_parent">
-
                    </android.support.v7.widget.RecyclerView>
                 </LinearLayout>
                 <RelativeLayout
@@ -101,23 +100,23 @@
                     android:id="@+id/tab3"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#5b89ff"
                     android:orientation="vertical">
-                    <TextView
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recycler_cart"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="This is tab 3" />
+                        android:layout_height="match_parent">
+                    </android.support.v7.widget.RecyclerView>
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/tab4"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#5b89ff"
                     android:orientation="vertical">
-                    <TextView
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/recycler_wish"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:text="This is tab 4" />
+                        android:layout_height="match_parent">
+                    </android.support.v7.widget.RecyclerView>
                 </LinearLayout>
             </FrameLayout>
         </RelativeLayout>

@@ -1,10 +1,13 @@
 package com.matiullahkarimi.onlineshopping;
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -26,18 +29,22 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kogitune.activity_transition.ActivityTransitionLauncher;
+
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     TabHost tabHost;
     ArrayList<String> arrayList;
+    ImageView pImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +64,20 @@ public class MainActivity extends AppCompatActivity
 
         // message arraylist
         arrayList = new ArrayList<>();
+        Button btnSend = (Button) findViewById(R.id.btn_send);
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText mess = (EditText) findViewById(R.id.message);
+                arrayList.add(mess.getText().toString());
+                mess.setText("");
+            }
+        });
+        ListView mlist = (ListView) findViewById(R.id.listView);
+        ArrayAdapter<String> adapter1 = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, arrayList);
+        mlist.setAdapter(adapter1);
 
         // starting tabs
-
         TabHost host = (TabHost) findViewById(R.id.tabHost);
         host.setup();
 //Tab 1
@@ -147,10 +165,10 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    // swiping the tabs
-
+    // Defining Recycler lists
     private void setUpRecyclerView(){
 
+        // listing products in home tab
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
         RecyclerAdapter adapter = new RecyclerAdapter(this, Product.getData());
         recyclerView.setAdapter(adapter);
@@ -165,36 +183,57 @@ public class MainActivity extends AppCompatActivity
                         Intent intent = new Intent(MainActivity.this, ProductDetail.class);
                         intent.putExtra("position", position);
                         Log.d("position", position+"");
-                        startActivity(intent);
-                    }
+                        ActivityTransitionLauncher.with(MainActivity.this).from(view).launch(intent);
 
+                    }
                     @Override public void onLongItemClick(View view, int position) {
                         Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
                     }
                 })
         );
 
-       // final RecyclerView msgRecycler = (RecyclerView) findViewById(R.id.msg_recycler);
+        // listing products in cart tab
+        final RecyclerView cartRecycler = (RecyclerView) findViewById(R.id.recycler_cart);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        cartRecycler.setLayoutManager(linearLayoutManager);
+        cartRecycler.setAdapter(adapter);
 
+        cartRecycler.addOnItemTouchListener(
+                new RecyclerItemClickListener(MainActivity.this, cartRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Intent intent = new Intent(MainActivity.this, ProductDetail.class);
+                        intent.putExtra("position", position);
+                        Log.d("position", position+"");
+                        startActivity(intent);
+                    }
+                    @Override public void onLongItemClick(View view, int position) {
+                        Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
+                    }
+                })
+        );
 
-        Button btnSend = (Button) findViewById(R.id.btn_send);
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EditText mess = (EditText) findViewById(R.id.message);
-                arrayList.add(mess.getText().toString());
-                mess.setText("");
-            }
-        });
+        // listing products in wishlist tab
+        final RecyclerView wishRecycler = (RecyclerView) findViewById(R.id.recycler_wish);
+        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        wishRecycler.setLayoutManager(linearLayoutManager1);
+        wishRecycler.setAdapter(adapter);
 
-        ListView mlist = (ListView) findViewById(R.id.listView);
+        wishRecycler.addOnItemTouchListener(
+                new RecyclerItemClickListener(MainActivity.this, wishRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        Intent intent = new Intent(MainActivity.this, ProductDetail.class);
+                        intent.putExtra("position", position);
 
-        ArrayAdapter<String> adapter1 = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, arrayList);
-        mlist.setAdapter(adapter1);
+                       startActivity(intent);
+                    }
+                    @Override public void onLongItemClick(View view, int position) {
+                        Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
+                    }
+                })
+        );
 
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-//        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//        msgRecycler.setLayoutManager(linearLayoutManager);
     }
 
 }

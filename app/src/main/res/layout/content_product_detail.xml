@@ -16,6 +16,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:id="@+id/dImage"
+        android:transitionName="profile"
         android:layout_height="300dp"
         android:src="@drawable/thief"/>
 
@@ -65,6 +66,8 @@
             android:id="@+id/btn_buy"
             android:layout_weight="1"/>
     </LinearLayout>
+
+
 
 
 </LinearLayout>
