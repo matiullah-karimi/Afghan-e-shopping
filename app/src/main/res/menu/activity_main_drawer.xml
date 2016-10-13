@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_account"
+            android:icon="@drawable/account_circle"
+            android:title="My Account" />
+        <item android:title="Category">
+            <menu>
+                <item
+                    android:id="@+id/nav_men"
+                    android:icon="@drawable/account"
+                    android:title="Men" />
+                <item
+                    android:id="@+id/nav_women"
+                    android:icon="@drawable/account_outline"
+                    android:title="Women" />
+                <item
+                    android:id="@+id/nav_kid"
+                    android:icon="@drawable/worker"
+                    android:title="Kid"/>
+            </menu>
+        </item>
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/information"
+                android:title="About us" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/logout"
+                android:title="Logout" />
+        </menu>
+    </item>
+
+</menu>

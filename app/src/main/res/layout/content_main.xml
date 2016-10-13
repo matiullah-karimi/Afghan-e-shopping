@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.matiullahkarimi.onlineshopping.MainActivity"
+    tools:showIn="@layout/app_bar_main">
+
+    <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/tabHost"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"></TabWidget>
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginBottom="50dp">
+                <LinearLayout
+                    android:id="@+id/tab1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                   <android.support.v7.widget.RecyclerView
+                       android:id="@+id/recycler"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent">
+
+                   </android.support.v7.widget.RecyclerView>
+                </LinearLayout>
+                <RelativeLayout
+                    android:id="@+id/tab2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    >
+                   <!--<android.support.v7.widget.RecyclerView-->
+                       <!--android:id="@+id/msg_recycler"-->
+                       <!--android:layout_width="match_parent"-->
+                       <!--android:layout_height="wrap_content">-->
+
+                    <ListView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/listView"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true">
+
+                    </ListView>
+                       <LinearLayout
+                           android:layout_width="match_parent"
+                           android:layout_height="wrap_content"
+                           android:background="@color/white"
+                           android:layout_alignParentTop="false"
+                           android:layout_alignParentBottom="true"
+                           android:layout_centerHorizontal="true"
+                           android:layout_gravity="bottom"
+                           android:orientation="horizontal"
+                           android:weightSum="4">
+                           
+                           <EditText
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:hint="Enter Message"
+                               android:paddingLeft="10dp"
+                               android:background="@null"
+                               android:layout_marginRight="10dp"
+                               android:layout_marginLeft="10dp"
+                               android:lines="1"
+                               android:layout_weight="3"
+                               android:id="@+id/message"/>
+
+                           <Button
+                               android:layout_width="0dp"
+                               android:layout_height="wrap_content"
+                               android:layout_weight="1"
+                               android:background="@android:drawable/ic_menu_send"
+                               android:id="@+id/btn_send"
+                               android:textSize="16dp"
+                               android:textColor="@color/colorPrimary"/>
+
+                       </LinearLayout>
+                   <!--</android.support.v7.widget.RecyclerView>-->
+                </RelativeLayout>
+                <LinearLayout
+                    android:id="@+id/tab3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#5b89ff"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="This is tab 3" />
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/tab4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#5b89ff"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="This is tab 4" />
+                </LinearLayout>
+            </FrameLayout>
+        </RelativeLayout>
+    </TabHost>
+</RelativeLayout>
