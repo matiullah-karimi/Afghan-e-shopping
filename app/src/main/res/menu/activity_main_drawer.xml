@@ -27,6 +27,10 @@
     <item android:title="Communicate">
         <menu>
             <item
+                android:id="@+id/nav_login"
+                android:icon="@drawable/logout"
+                android:title="Login" />
+            <item
                 android:id="@+id/nav_about"
                 android:icon="@drawable/information"
                 android:title="About us" />

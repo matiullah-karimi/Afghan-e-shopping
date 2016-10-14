@@ -1,5 +1,9 @@
 package com.matiullahkarimi.onlineshopping;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.security.Policy;
 import java.util.ArrayList;
 
@@ -8,12 +12,12 @@ import java.util.ArrayList;
  */
 public class Product {
     private String name;
-    private int image;
+    private String image;
     private String price;
 
     public Product(){}
 
-    public Product(String name, int image, String price) {
+    public Product(String name, String image, String price) {
         this.name = name;
         this.image = image;
         this.price = price;
@@ -27,11 +31,11 @@ public class Product {
         this.name = name;
     }
 
-    public int getImage() {
+    public String getImage() {
         return image;
     }
 
-    public void setImage(int image) {
+    public void setImage(String image) {
         this.image = image;
     }
 
@@ -41,28 +45,5 @@ public class Product {
 
     public void setPrice(String price) {
         this.price = price;
-    }
-
-    public static ArrayList<Product> getData(){
-        ArrayList<Product> dataList = new ArrayList<>();
-
-        int[] images = getImages();
-
-        for (int i=0; i< images.length; i++){
-            Product product = new Product();
-            product.setImage(images[i]);
-            product.setName("Image " + i);
-            product.setPrice( i + "000 AF");
-            dataList.add(product);
-        }
-
-        return dataList;
-    }
-
-    public static int[] getImages(){
-        int[] images = {R.drawable.girl3, R.drawable.avatar, R.drawable.doctor, R.drawable.captain, R.drawable.judge,
-        R.drawable.monk, R.drawable.thief, R.drawable.woman};
-
-        return images;
     }
 }

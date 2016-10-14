@@ -1,8 +1,10 @@
 package com.matiullahkarimi.onlineshopping;
 
 import android.app.ActivityOptions;
+import android.app.LocalActivityManager;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -16,6 +18,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -31,20 +34,29 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.kogitune.activity_transition.ActivityTransitionLauncher;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
     TabHost tabHost;
-    ArrayList<String> arrayList;
     ImageView pImage;
+    ProductClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +65,9 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // callign method fetchProducts()
+        fetchProducts();
+        // navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -62,24 +77,11 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // message arraylist
-        arrayList = new ArrayList<>();
-        Button btnSend = (Button) findViewById(R.id.btn_send);
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EditText mess = (EditText) findViewById(R.id.message);
-                arrayList.add(mess.getText().toString());
-                mess.setText("");
-            }
-        });
-        ListView mlist = (ListView) findViewById(R.id.listView);
-        ArrayAdapter<String> adapter1 = new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, arrayList);
-        mlist.setAdapter(adapter1);
-
         // starting tabs
         TabHost host = (TabHost) findViewById(R.id.tabHost);
-        host.setup();
+        LocalActivityManager mLocalActivityManager = new LocalActivityManager(MainActivity.this, false);
+        mLocalActivityManager.dispatchCreate(savedInstanceState); // state will be bundle your activity state which you get in onCreate
+        host.setup(mLocalActivityManager);
 //Tab 1
         TabHost.TabSpec spec = host.newTabSpec("Home");
         spec.setContent(R.id.tab1);
@@ -88,17 +90,20 @@ public class MainActivity extends AppCompatActivity
         host.addTab(spec);
 //Tab 2
         spec = host.newTabSpec("Message");
-        spec.setContent(R.id.tab2);
+        Intent intentMessage = new Intent(this, Message.class);
+        spec.setContent(intentMessage);
         spec.setIndicator("",ContextCompat.getDrawable(this, R.drawable.ic_message_black_24dp));
         host.addTab(spec);
 //Tab 3
         spec = host.newTabSpec("Wishlist");
-        spec.setContent(R.id.tab3);
+        Intent wishlistIntent = new Intent(this, Wishlist.class);
+        spec.setContent(wishlistIntent);
         spec.setIndicator("",ContextCompat.getDrawable(this, R.drawable.heart));
         host.addTab(spec);
 //Tab 4
         spec = host.newTabSpec("Cart");
-        spec.setContent(R.id.tab4);
+        Intent cartIntent = new Intent(this, Cart.class);
+        spec.setContent(cartIntent);
         spec.setIndicator("", ContextCompat.getDrawable(this, R.drawable.ic_shopping_cart_black_24dp));
         host.addTab(spec);
     }
@@ -149,13 +154,24 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, Account.class);
             startActivity(intent);
         } else if (id == R.id.nav_men) {
-
+            Intent intent = new Intent(MainActivity.this, ProductCategories.class);
+            intent.putExtra("Category", "men");
+            startActivity(intent);
         } else if (id == R.id.nav_women) {
-
+            Intent intent = new Intent(MainActivity.this, ProductCategories.class);
+            intent.putExtra("Category", "women");
+            startActivity(intent);
         } else if (id == R.id.nav_kid) {
-
-        } else if (id == R.id.nav_about) {
-
+            Intent intent = new Intent(MainActivity.this, ProductCategories.class);
+            intent.putExtra("Category", "kid");
+            startActivity(intent);
+        }else if (id == R.id.nav_login){
+            Intent intent = new Intent(MainActivity.this, Login.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.nav_about) {
+            Intent intent = new Intent(MainActivity.this, About.class);
+            startActivity(intent);
         } else if (id == R.id.nav_logout) {
 
         }
@@ -170,8 +186,7 @@ public class MainActivity extends AppCompatActivity
 
         // listing products in home tab
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
-        RecyclerAdapter adapter = new RecyclerAdapter(this, Product.getData());
-        recyclerView.setAdapter(adapter);
+        RecyclerAdapter adapter = new RecyclerAdapter(this, new ArrayList<Product>());
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(gridLayoutManager);
@@ -191,49 +206,47 @@ public class MainActivity extends AppCompatActivity
                     }
                 })
         );
+    }
 
-        // listing products in cart tab
-        final RecyclerView cartRecycler = (RecyclerView) findViewById(R.id.recycler_cart);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        cartRecycler.setLayoutManager(linearLayoutManager);
-        cartRecycler.setAdapter(adapter);
+    private void fetchProducts() {
 
-        cartRecycler.addOnItemTouchListener(
-                new RecyclerItemClickListener(MainActivity.this, cartRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
-                        Intent intent = new Intent(MainActivity.this, ProductDetail.class);
-                        intent.putExtra("position", position);
-                        Log.d("position", position+"");
-                        startActivity(intent);
+        client = new ProductClient();
+        client.getProducts(new JsonHttpResponseHandler() {
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d("response", response.toString());
+                try {
+                    JSONArray products = response.getJSONArray("teachers");
+                    ArrayList<Product> names = new ArrayList<Product>();
+                    for(int i=0; i<products.length(); i++){
+                        JSONObject inner = products.getJSONObject(i);
+                        String name = inner.getString("name");
+                        String image = inner.getString("image");
+                        String price = inner.getString("id");
+                        names.add(new Product(name, image, price));
                     }
-                    @Override public void onLongItemClick(View view, int position) {
-                        Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
-                    }
-                })
-        );
+                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
+                    RecyclerAdapter adapter = new RecyclerAdapter(MainActivity.this, names);
+                    recyclerView.setAdapter(adapter);
 
-        // listing products in wishlist tab
-        final RecyclerView wishRecycler = (RecyclerView) findViewById(R.id.recycler_wish);
-        LinearLayoutManager linearLayoutManager1 = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        wishRecycler.setLayoutManager(linearLayoutManager1);
-        wishRecycler.setAdapter(adapter);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
+                    recyclerView.setLayoutManager(gridLayoutManager);
+                    recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        wishRecycler.addOnItemTouchListener(
-                new RecyclerItemClickListener(MainActivity.this, wishRecycler ,new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
-                        Intent intent = new Intent(MainActivity.this, ProductDetail.class);
-                        intent.putExtra("position", position);
 
-                       startActivity(intent);
-                    }
-                    @Override public void onLongItemClick(View view, int position) {
-                        Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
-                    }
-                })
-        );
+                } catch (JSONException e) {
+                    // Invalid JSON format, show appropriate error.
+                    e.printStackTrace();
+                }
+            }
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d("responsemessage",throwable.toString());
+            }
 
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
     }
 
 }

@@ -29,7 +29,7 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
     ValueAnimator animator;
     Boolean wish, addToCart;
     private ExitActivityTransition exitTransition;
-    ArrayList<Product> dataList = new ArrayList<Product>(Product.getData());
+    ArrayList<Product> dataList = new ArrayList<Product>(new ArrayList<Product>());
     private Button btnBuy, btnAdd2Cart, btnAdd2Wishlist;
 
 
@@ -54,7 +54,7 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         Log.d("poston", position+"");
 
         // setting values to views
-        pImage.setImageResource(dataList.get(position).getImage());
+       // pImage.setImageResource(dataList.get(position).getImage());
         pName.setText(dataList.get(position).getName());
         pPrice.setText(dataList.get(position).getPrice());
 
