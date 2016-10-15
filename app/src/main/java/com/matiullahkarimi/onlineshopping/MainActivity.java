@@ -47,6 +47,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -57,7 +58,8 @@ public class MainActivity extends AppCompatActivity
     TabHost tabHost;
     ImageView pImage;
     ProductClient client;
-
+    ProgressBar progressBar;
+    Helper helper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +79,10 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // helper class
+        helper = new Helper();
+        helper.showProgressBar(this, "Loading...");
+
         // starting tabs
         TabHost host = (TabHost) findViewById(R.id.tabHost);
         LocalActivityManager mLocalActivityManager = new LocalActivityManager(MainActivity.this, false);
@@ -91,7 +97,7 @@ public class MainActivity extends AppCompatActivity
 //Tab 2
         spec = host.newTabSpec("Message");
         Intent intentMessage = new Intent(this, Message.class);
-        spec.setContent(intentMessage);
+        spec.setContent(intentMessage.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
         spec.setIndicator("",ContextCompat.getDrawable(this, R.drawable.ic_message_black_24dp));
         host.addTab(spec);
 //Tab 3
@@ -192,20 +198,7 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setLayoutManager(gridLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(MainActivity.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
-                        Intent intent = new Intent(MainActivity.this, ProductDetail.class);
-                        intent.putExtra("position", position);
-                        Log.d("position", position+"");
-                        ActivityTransitionLauncher.with(MainActivity.this).from(view).launch(intent);
 
-                    }
-                    @Override public void onLongItemClick(View view, int position) {
-                        Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
-                    }
-                })
-        );
     }
 
     private void fetchProducts() {
@@ -214,9 +207,12 @@ public class MainActivity extends AppCompatActivity
         client.getProducts(new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
+
+                helper.hideProgressDialog();
+
                 try {
                     JSONArray products = response.getJSONArray("teachers");
-                    ArrayList<Product> names = new ArrayList<Product>();
+                    final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
                         String name = inner.getString("name");
@@ -225,12 +221,30 @@ public class MainActivity extends AppCompatActivity
                         names.add(new Product(name, image, price));
                     }
                     RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
-                    RecyclerAdapter adapter = new RecyclerAdapter(MainActivity.this, names);
+                    final RecyclerAdapter adapter = new RecyclerAdapter(MainActivity.this, names);
                     recyclerView.setAdapter(adapter);
 
                     GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
                     recyclerView.setLayoutManager(gridLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+                    recyclerView.addOnItemTouchListener(
+                            new RecyclerItemClickListener(MainActivity.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                                @Override public void onItemClick(View view, int position) {
+
+                                    Intent intent = new Intent(MainActivity.this, ProductDetail.class);
+                                    intent.putExtra("name", names.get(position).getName());
+                                    intent.putExtra("price", names.get(position).getPrice());
+                                    intent.putExtra("image", names.get(position).getImage());
+                                    intent.putExtra("position", position);
+                                    ActivityTransitionLauncher.with(MainActivity.this).from(view).launch(intent);
+
+                                }
+                                @Override public void onLongItemClick(View view, int position) {
+                                    Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
+                                }
+                            })
+                    );
 
 
                 } catch (JSONException e) {

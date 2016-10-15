@@ -12,7 +12,7 @@ import java.util.HashMap;
  * Created by Matiullah Karimi on 10/14/2016.
  */
 public class ProductClient {
-    private static final String API_BASE_URL = "http://192.168.100.100:8080/api/teacher";
+    private static final String API_BASE_URL = "http://172.30.10.165:8080/api/teacher";
     private AsyncHttpClient client;
 
     public ProductClient() {
