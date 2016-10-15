@@ -45,6 +45,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -55,11 +56,12 @@ import cz.msebera.android.httpclient.Header;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
-    TabHost tabHost;
-    ImageView pImage;
-    ProductClient client;
-    ProgressBar progressBar;
-    Helper helper;
+    private ProductClient client;
+    private Helper helper;
+    private Button btnRetry;
+    private TextView txtNoInternet;
+    private RecyclerView recyclerView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,8 +69,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // callign method fetchProducts()
-        fetchProducts();
+
         // navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -79,10 +80,35 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // initializing views
+        btnRetry = (Button) findViewById(R.id.btn_retry);
+        txtNoInternet = (TextView) findViewById(R.id.no_internet);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler);
+
         // helper class
         helper = new Helper();
-        helper.showProgressBar(this, "Loading...");
 
+        // checking the internet connection
+        if (!helper.isNetworkAvailable(this)){
+            helper.toast(this, "No Internet Connection");
+            recyclerView.setVisibility(View.GONE);
+            btnRetry.setVisibility(View.VISIBLE);
+            txtNoInternet.setVisibility(View.VISIBLE);
+            btnRetry.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                    finish();
+                    startActivity(intent);
+                }
+            });
+        }
+        else {
+            // show progress bar
+            helper.showProgressBar(this, "Loading...");
+            // calling method fetchProducts()
+            fetchProducts();
+        }
         // starting tabs
         TabHost host = (TabHost) findViewById(R.id.tabHost);
         LocalActivityManager mLocalActivityManager = new LocalActivityManager(MainActivity.this, false);
@@ -92,7 +118,6 @@ public class MainActivity extends AppCompatActivity
         TabHost.TabSpec spec = host.newTabSpec("Home");
         spec.setContent(R.id.tab1);
         spec.setIndicator("",ContextCompat.getDrawable(this, R.drawable.ic_home_black));
-        setUpRecyclerView();
         host.addTab(spec);
 //Tab 2
         spec = host.newTabSpec("Message");
@@ -187,20 +212,6 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    // Defining Recycler lists
-    private void setUpRecyclerView(){
-
-        // listing products in home tab
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
-        RecyclerAdapter adapter = new RecyclerAdapter(this, new ArrayList<Product>());
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(gridLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-
-
-    }
-
     private void fetchProducts() {
 
         client = new ProductClient();
@@ -211,16 +222,17 @@ public class MainActivity extends AppCompatActivity
                 helper.hideProgressDialog();
 
                 try {
-                    JSONArray products = response.getJSONArray("teachers");
+                    JSONArray products = response.getJSONArray("products");
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
                         String name = inner.getString("name");
-                        String image = inner.getString("image");
-                        String price = inner.getString("id");
-                        names.add(new Product(name, image, price));
+                        String image = inner.getString("imagePath");
+                        String price = inner.getString("price");
+                        String description = inner.getString("description");
+                        names.add(new Product(name, image, price, description));
                     }
-                    RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler);
+
                     final RecyclerAdapter adapter = new RecyclerAdapter(MainActivity.this, names);
                     recyclerView.setAdapter(adapter);
 
@@ -236,6 +248,7 @@ public class MainActivity extends AppCompatActivity
                                     intent.putExtra("name", names.get(position).getName());
                                     intent.putExtra("price", names.get(position).getPrice());
                                     intent.putExtra("image", names.get(position).getImage());
+                                    intent.putExtra("description", names.get(position).getDescription());
                                     intent.putExtra("position", position);
                                     ActivityTransitionLauncher.with(MainActivity.this).from(view).launch(intent);
 
@@ -252,13 +265,43 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
+            @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
                 Log.d("responsemessage",throwable.toString());
+
+                helper.hideProgressDialog();
+                recyclerView.setVisibility(View.GONE);
+                btnRetry.setVisibility(View.VISIBLE);
+                txtNoInternet.setVisibility(View.VISIBLE);
+                txtNoInternet.setText("Unable to connect to the server");
+                btnRetry.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        finish();
+                        startActivity(intent);
+                    }
+                });
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+
+                helper.hideProgressDialog();
+                recyclerView.setVisibility(View.GONE);
+                btnRetry.setVisibility(View.VISIBLE);
+                txtNoInternet.setVisibility(View.VISIBLE);
+                txtNoInternet.setText("Unable to connect to the server");
+                btnRetry.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        finish();
+                        startActivity(intent);
+                    }
+                });
             }
         });
     }

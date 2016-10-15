@@ -65,7 +65,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
         public void setData(Product current, int position) {
             this.name.setText(current.getName());
-            Picasso.with(context).load(Uri.parse("http://172.30.10.165:8080/images/"+current.getImage())).error(R.drawable.avatar).into(this.image);
+            Picasso.with(context).load(Uri.parse("http://172.30.10.165:8080/img/"+current.getImage())).error(R.drawable.avatar).into(this.image);
             Log.d("curren_image", current.getImage());
             this.price.setText(current.getPrice());
             this.position = position;

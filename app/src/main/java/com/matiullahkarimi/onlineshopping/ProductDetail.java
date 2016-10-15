@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class ProductDetail extends AppCompatActivity implements View.OnClickListener{
     ImageView pImage;
     TextView pName;
-    TextView pPrice;
+    TextView pPrice, pDesc;
     ValueAnimator animator;
     Boolean wish, addToCart;
     private ExitActivityTransition exitTransition;
@@ -51,6 +51,7 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         pImage = (ImageView) findViewById(R.id.dImage);
         pName = (TextView) findViewById(R.id.dName);
         pPrice = (TextView) findViewById(R.id.dPrice);
+        pDesc = (TextView) findViewById(R.id.dDescription);
         btnAdd2Cart = (Button) findViewById(R.id.btn_cart);
         btnAdd2Wishlist = (Button) findViewById(R.id.btn_wish);
 
@@ -58,11 +59,13 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         String name = getIntent().getStringExtra("name");
         String price = getIntent().getStringExtra("price");
         String image = getIntent().getStringExtra("image");
+        String description = getIntent().getStringExtra("description");
         // setting values to views
        // pImage.setImageResource(dataList.get(position).getImage());
         pName.setText(name);
         pPrice.setText(price);
-        Picasso.with(ProductDetail.this).load(Uri.parse("http://172.30.10.165:8080/images/"+image)).error(R.drawable.avatar).into(pImage);
+        pDesc.setText(description);
+        Picasso.with(ProductDetail.this).load(Uri.parse("http://172.30.10.165:8080/img/"+image)).error(R.drawable.avatar).into(pImage);
 
 
         // initial value of wish boolean

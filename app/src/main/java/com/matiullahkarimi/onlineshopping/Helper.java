@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.widget.Toast;
 
 /**
  * Created by Karimi on 10/15/2016.
@@ -35,5 +36,9 @@ public class Helper {
 
         }
         return isAvailable;
+    }
+
+    public void toast(Context context, String message){
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 }

@@ -13,12 +13,34 @@
         android:id="@+id/tab3"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_cart"
+            android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         </android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/no_internet"
+            android:text="@string/no_internet"
+            android:textStyle="bold"
+            android:textColor="@color/red"
+            android:textAlignment="center"
+            android:visibility="gone"
+            android:layout_gravity="center_vertical" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_retry"
+            android:layout_gravity="center_horizontal"
+            android:text="Retry"
+            android:visibility="gone"
+            android:layout_marginTop="20dp"/>
     </LinearLayout>
 
 </RelativeLayout>

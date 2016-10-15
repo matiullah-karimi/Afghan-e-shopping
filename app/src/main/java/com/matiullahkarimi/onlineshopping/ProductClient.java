@@ -12,7 +12,7 @@ import java.util.HashMap;
  * Created by Matiullah Karimi on 10/14/2016.
  */
 public class ProductClient {
-    private static final String API_BASE_URL = "http://172.30.10.165:8080/api/teacher";
+    private static final String API_BASE_URL = "http://172.30.10.165:8080/api/products";
     private AsyncHttpClient client;
 
     public ProductClient() {
@@ -35,7 +35,7 @@ public class ProductClient {
     }
 
     public void getProducts( JsonHttpResponseHandler handler){
-        String url = getApiUrl("/products");
+        String url = getApiUrl("");
         client.get(url,handler);
     }
 }
