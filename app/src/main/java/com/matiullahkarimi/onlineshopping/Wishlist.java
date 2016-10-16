@@ -31,6 +31,7 @@ public class Wishlist extends AppCompatActivity {
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +42,9 @@ public class Wishlist extends AppCompatActivity {
         txtNoInternet = (TextView) findViewById(R.id.no_internet);
         recyclerView = (RecyclerView) findViewById(R.id.recycler);
 
-        // helper class
+        // initiaizing class
         helper = new Helper();
+        sessionManager = new SessionManager(this);
 
         // checking the internet connection
         if (!helper.isNetworkAvailable(this)) {
@@ -69,14 +71,14 @@ public class Wishlist extends AppCompatActivity {
     private void fetchProducts() {
 
         client = new ProductClient();
-        client.getProducts(new JsonHttpResponseHandler() {
+        client.wishlists(helper.getToken(Wishlist.this), new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
 
                 helper.hideProgressDialog();
 
                 try {
-                    JSONArray products = response.getJSONArray("teachers");
+                    JSONArray products = response.getJSONArray("wishlists");
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);

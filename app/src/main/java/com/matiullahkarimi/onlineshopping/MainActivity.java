@@ -226,7 +226,7 @@ public class MainActivity extends AppCompatActivity
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
-                        String name = inner.getString("name");
+                        String name = inner.getString("title");
                         String image = inner.getString("imagePath");
                         String price = inner.getString("price");
                         String description = inner.getString("description");
