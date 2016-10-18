@@ -81,11 +81,12 @@ public class Cart extends AppCompatActivity {
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
+                        String id = inner.getString("id");
                         String name = inner.getString("title");
                         String image = inner.getString("imagePath");
                         String price = inner.getString("price");
                         String description = inner.getString("description");
-                        names.add(new Product(name, image, price, description));
+                        names.add(new Product(id, name, image, price, description));
                     }
 
                     final RecyclerAdapter adapter = new RecyclerAdapter(Cart.this, names);

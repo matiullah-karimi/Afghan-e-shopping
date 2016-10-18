@@ -13,6 +13,7 @@ import java.util.HashMap;
  */
 public class ProductClient {
     private static final String API_BASE_URL = "http://172.30.10.165:8080/api";
+    public static final String IMAGES_BASE_URL = "http://172.30.10.165:8080/img/";
     private AsyncHttpClient client;
 
     public ProductClient() {
@@ -41,7 +42,7 @@ public class ProductClient {
 
     // add a product to wishlist
     public void addToWishlist(String pId, String token, JsonHttpResponseHandler handler){
-        String url = getApiUrl("/addToWishlist?"+token);
+        String url = getApiUrl("/addToWishlist/"+pId+"/?token="+token);
         client.post(url, handler);
     }
 
@@ -52,7 +53,24 @@ public class ProductClient {
     }
 
     public void removeFromWishlist(String pId, String token, JsonHttpResponseHandler handler){
-        String url = getApiUrl("/removeFromWishlist?"+token);
+        String url = getApiUrl("/removeFromWishlist/"+pId+"?token="+token);
+        client.post(url, handler);
+    }
+
+    // add a product to cart
+    public void addToCart(String pId, String token, JsonHttpResponseHandler handler){
+        String url = getApiUrl("/addToCart?token="+token);
+        client.post(url, handler);
+    }
+
+    // get user carts
+    public void carts(String token, JsonHttpResponseHandler handler){
+        String url = getApiUrl("/carts?token="+token);
+        client.get(url, handler);
+    }
+
+    public void removeFromCart(String pId, String token, JsonHttpResponseHandler handler){
+        String url = getApiUrl("/removeFromCart?token="+token);
         client.post(url, handler);
     }
 
