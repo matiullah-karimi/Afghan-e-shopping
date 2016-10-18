@@ -107,6 +107,7 @@ public class Wishlist extends AppCompatActivity {
                                     intent.putExtra("price", names.get(position).getPrice());
                                     intent.putExtra("image", names.get(position).getImage());
                                     intent.putExtra("position", position);
+                                    intent.putExtra("activity", "Wishlist");
                                     ActivityTransitionLauncher.with(Wishlist.this).from(view).launch(intent);
 
                                 }

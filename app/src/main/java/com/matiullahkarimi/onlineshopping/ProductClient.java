@@ -12,8 +12,8 @@ import java.util.HashMap;
  * Created by Matiullah Karimi on 10/14/2016.
  */
 public class ProductClient {
-    private static final String API_BASE_URL = "http://172.30.10.165:8080/api";
-    public static final String IMAGES_BASE_URL = "http://172.30.10.165:8080/img/";
+    private static final String API_BASE_URL = "http://10.19.1.61:8080/api";
+    public static final String IMAGES_BASE_URL = "http://10.19.1.61:8080/img/";
     private AsyncHttpClient client;
 
     public ProductClient() {
@@ -59,7 +59,7 @@ public class ProductClient {
 
     // add a product to cart
     public void addToCart(String pId, String token, JsonHttpResponseHandler handler){
-        String url = getApiUrl("/addToCart?token="+token);
+        String url = getApiUrl("/addToCart/" + pId+ "?token="+token);
         client.post(url, handler);
     }
 
@@ -70,7 +70,7 @@ public class ProductClient {
     }
 
     public void removeFromCart(String pId, String token, JsonHttpResponseHandler handler){
-        String url = getApiUrl("/removeFromCart?token="+token);
+        String url = getApiUrl("/removeFromCart/"+pId+"?token="+token);
         client.post(url, handler);
     }
 

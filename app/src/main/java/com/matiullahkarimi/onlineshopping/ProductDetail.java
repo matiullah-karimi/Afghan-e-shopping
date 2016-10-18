@@ -44,6 +44,7 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
     private ImageButton btnAdd2Wishlist;
     private ProductClient client;
     private String pId;
+    private String activity;
 
 
     @Override
@@ -72,6 +73,8 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         String price = getIntent().getStringExtra("price");
         String image = getIntent().getStringExtra("image");
         String description = getIntent().getStringExtra("description");
+        activity = getIntent().getStringExtra("activity");
+        Log.d("computer", activity);
         // setting values to views
        // pImage.setImageResource(dataList.get(position).getImage());
         pName.setText(name);
@@ -83,6 +86,8 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         // initial value of wish boolean
         wish = false;
         addToCart = false;
+
+        buttonCart();
 
         // registering views to listeners
         btnBuy.setOnClickListener(this);
@@ -111,14 +116,8 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
                 }).show();
 
             case R.id.btn_cart:
-                if (!addToCart){
-                    addToCart = true;
-                    btnAdd2Cart.setBackgroundColor(Color.RED);
+                buttonCart();
 
-                }else {
-                    btnAdd2Cart.setBackgroundColor(Color.LTGRAY);
-                    addToCart = false;
-                }
                 break;
 
             case R.id.btn_wish:
@@ -184,5 +183,54 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
                 super.onFailure(statusCode, headers, responseString, throwable);
             }
         });
+    }
+
+    public void addToCart(String pId){
+
+        client = new ProductClient();
+        client.addToCart(pId, new Helper().getToken(ProductDetail.this), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("add_to wishlist", response.toString());
+                Toast.makeText(ProductDetail.this, "Successfully added to your carts", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+    }
+
+    public void removeFromCart(String pId){
+        client = new ProductClient();
+
+        client.removeFromCart(pId, new Helper().getToken(ProductDetail.this), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                Toast.makeText(ProductDetail.this, "Successfully removed from your carts", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
+    }
+
+    public void buttonCart(){
+        if (activity.equals("Cart")){
+            btnAdd2Cart.setText("Remove from Cart");
+            removeFromCart(pId);
+        }
+        else if(activity.equals("Wishlist")){
+            addToCart(pId);
+        }
+        else {
+            addToCart(pId);
+        }
     }
 }

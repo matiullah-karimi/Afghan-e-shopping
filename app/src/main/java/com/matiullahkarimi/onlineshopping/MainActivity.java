@@ -280,6 +280,7 @@ public class MainActivity extends AppCompatActivity
                                     intent.putExtra("image", names.get(position).getImage());
                                     intent.putExtra("description", names.get(position).getDescription());
                                     intent.putExtra("position", position);
+                                    intent.putExtra("activity", "MainActivity");
                                     ActivityTransitionLauncher.with(MainActivity.this).from(view).launch(intent);
 
                                 }

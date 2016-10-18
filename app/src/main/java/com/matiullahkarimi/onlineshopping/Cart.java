@@ -7,6 +7,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -70,14 +71,14 @@ public class Cart extends AppCompatActivity {
     private void fetchProducts() {
 
         client = new ProductClient();
-        client.getProducts(new JsonHttpResponseHandler() {
+        client.carts(helper.getToken(Cart.this), new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
 
                 helper.hideProgressDialog();
 
                 try {
-                    JSONArray products = response.getJSONArray("teachers");
+                    JSONArray products = response.getJSONArray("carts");
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
@@ -101,11 +102,13 @@ public class Cart extends AppCompatActivity {
                                 @Override public void onItemClick(View view, int position) {
 
                                     Intent intent = new Intent(Cart.this, ProductDetail.class);
+                                    intent.putExtra("id", names.get(position).getId());
                                     intent.putExtra("name", names.get(position).getName());
                                     intent.putExtra("price", names.get(position).getPrice());
                                     intent.putExtra("image", names.get(position).getImage());
                                     intent.putExtra("description", names.get(position).getImage());
                                     intent.putExtra("position", position);
+                                    intent.putExtra("activity", "Cart");
                                     ActivityTransitionLauncher.with(Cart.this).from(view).launch(intent);
 
                                 }
