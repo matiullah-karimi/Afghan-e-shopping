@@ -24,6 +24,21 @@ public class ProductClient {
         return API_BASE_URL + relativeUrl;
     }
 
+    // register the user
+    public void register(String name, String email, String password, JsonHttpResponseHandler handler){
+
+        HashMap<String, String> params = new HashMap<>();
+
+        params.put("name", name);
+        params.put("email", email);
+        params.put("password",password);
+
+        RequestParams requestParams = new RequestParams(params);
+
+        String url = getApiUrl("/register");
+        client.post(url, requestParams, handler);
+    }
+
     // login the user
     public void getLogin(String username,String password,JsonHttpResponseHandler handler){
             HashMap<String,String> params= new HashMap<String, String>();
