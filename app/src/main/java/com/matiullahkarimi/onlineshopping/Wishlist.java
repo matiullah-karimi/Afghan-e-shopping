@@ -82,11 +82,12 @@ public class Wishlist extends AppCompatActivity {
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
+                        String id = inner.getString("id");
                         String name = inner.getString("title");
                         String image = inner.getString("imagePath");
                         String price = inner.getString("price");
                         String description = inner.getString("description");
-                        names.add(new Product(name, image, price, description));
+                        names.add(new Product(id, name, image, price, description));
                     }
 
                     final RecyclerAdapter adapter = new RecyclerAdapter(Wishlist.this, names);
@@ -101,10 +102,12 @@ public class Wishlist extends AppCompatActivity {
                                 @Override public void onItemClick(View view, int position) {
 
                                     Intent intent = new Intent(Wishlist.this, ProductDetail.class);
+                                    intent.putExtra("id", names.get(position).getId());
                                     intent.putExtra("name", names.get(position).getName());
                                     intent.putExtra("price", names.get(position).getPrice());
                                     intent.putExtra("image", names.get(position).getImage());
                                     intent.putExtra("position", position);
+                                    intent.putExtra("activity", "Wishlist");
                                     ActivityTransitionLauncher.with(Wishlist.this).from(view).launch(intent);
 
                                 }

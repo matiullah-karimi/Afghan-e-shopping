@@ -12,6 +12,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -54,13 +55,14 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener{
 
     private ProductClient client;
     private Helper helper;
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,24 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // swipe to referesh
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+
+                                        fetchProducts();
+                                    }
+                                }
+        );
 
         // initializing views
         btnRetry = (Button) findViewById(R.id.btn_retry);
@@ -150,6 +170,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onRefresh() {
+        fetchProducts();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
@@ -214,10 +239,13 @@ public class MainActivity extends AppCompatActivity
 
     private void fetchProducts() {
 
+        swipeRefreshLayout.setRefreshing(true);
         client = new ProductClient();
+
         client.getProducts(new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
+                swipeRefreshLayout.setRefreshing(false);
 
                 helper.hideProgressDialog();
 
@@ -226,11 +254,12 @@ public class MainActivity extends AppCompatActivity
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
+                        String id = inner.getString("id");
                         String name = inner.getString("title");
                         String image = inner.getString("imagePath");
                         String price = inner.getString("price");
                         String description = inner.getString("description");
-                        names.add(new Product(name, image, price, description));
+                        names.add(new Product(id, name, image, price, description));
                     }
 
                     final RecyclerAdapter adapter = new RecyclerAdapter(MainActivity.this, names);
@@ -245,11 +274,13 @@ public class MainActivity extends AppCompatActivity
                                 @Override public void onItemClick(View view, int position) {
 
                                     Intent intent = new Intent(MainActivity.this, ProductDetail.class);
+                                    intent.putExtra("id", names.get(position).getId());
                                     intent.putExtra("name", names.get(position).getName());
                                     intent.putExtra("price", names.get(position).getPrice());
                                     intent.putExtra("image", names.get(position).getImage());
                                     intent.putExtra("description", names.get(position).getDescription());
                                     intent.putExtra("position", position);
+                                    intent.putExtra("activity", "MainActivity");
                                     ActivityTransitionLauncher.with(MainActivity.this).from(view).launch(intent);
 
                                 }
@@ -269,6 +300,7 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
                 Log.d("responsemessage",throwable.toString());
+                swipeRefreshLayout.setRefreshing(false);
 
                 helper.hideProgressDialog();
                 recyclerView.setVisibility(View.GONE);
@@ -288,6 +320,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
+                swipeRefreshLayout.setRefreshing(false);
 
                 helper.hideProgressDialog();
                 recyclerView.setVisibility(View.GONE);

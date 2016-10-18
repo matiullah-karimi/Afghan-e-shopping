@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,19 +22,29 @@ import android.widget.Toast;
 import com.cocosw.bottomsheet.BottomSheet;
 import com.kogitune.activity_transition.ActivityTransition;
 import com.kogitune.activity_transition.ExitActivityTransition;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import cz.msebera.android.httpclient.Header;
+
 public class ProductDetail extends AppCompatActivity implements View.OnClickListener{
-    ImageView pImage;
-    TextView pName;
-    TextView pPrice, pDesc;
-    ValueAnimator animator;
-    Boolean wish, addToCart;
+    private ImageView pImage;
+    private TextView pName;
+    private TextView pPrice, pDesc;
+    private ValueAnimator animator;
+    private Boolean wish, addToCart;
     private ExitActivityTransition exitTransition;
-    ArrayList<Product> dataList = new ArrayList<Product>(new ArrayList<Product>());
-    private Button btnBuy, btnAdd2Cart, btnAdd2Wishlist;
+    private ArrayList<Product> dataList = new ArrayList<Product>(new ArrayList<Product>());
+    private Button btnBuy, btnAdd2Cart;
+    private ImageButton btnAdd2Wishlist;
+    private ProductClient client;
+    private String pId;
+    private String activity;
 
 
     @Override
@@ -53,27 +64,33 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         pPrice = (TextView) findViewById(R.id.dPrice);
         pDesc = (TextView) findViewById(R.id.dDescription);
         btnAdd2Cart = (Button) findViewById(R.id.btn_cart);
-        btnAdd2Wishlist = (Button) findViewById(R.id.btn_wish);
+        btnBuy = (Button) findViewById(R.id.btn_buy);
+        btnAdd2Wishlist = (ImageButton) findViewById(R.id.btn_wish);
 
         // getting the select view position
+        pId = getIntent().getStringExtra("id");
         String name = getIntent().getStringExtra("name");
         String price = getIntent().getStringExtra("price");
         String image = getIntent().getStringExtra("image");
         String description = getIntent().getStringExtra("description");
+        activity = getIntent().getStringExtra("activity");
+        Log.d("computer", activity);
         // setting values to views
        // pImage.setImageResource(dataList.get(position).getImage());
         pName.setText(name);
         pPrice.setText(price);
         pDesc.setText(description);
-        Picasso.with(ProductDetail.this).load(Uri.parse("http://172.30.10.165:8080/img/"+image)).error(R.drawable.avatar).into(pImage);
+        Picasso.with(ProductDetail.this).load(Uri.parse(ProductClient.IMAGES_BASE_URL+image)).error(R.drawable.avatar).into(pImage);
 
 
         // initial value of wish boolean
         wish = false;
         addToCart = false;
 
+        buttonCart();
+
         // registering views to listeners
-//        btnBuy.setOnClickListener(this);
+        btnBuy.setOnClickListener(this);
         btnAdd2Cart.setOnClickListener(this);
         btnAdd2Wishlist.setOnClickListener(this);
     }
@@ -86,35 +103,36 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         int id = view.getId();
         switch (id){
-//            case R.id.btn_buy:
-//                new BottomSheet.Builder(ProductDetail.this).title("title").sheet(R.menu.menu).listener(new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        switch (which) {
-//                            case R.id.help:
-//                                Toast.makeText(ProductDetail.this, "help me", Toast.LENGTH_LONG).show();
-//                                break;
-//                        }
-//                    }
-//                }).show();
+            case R.id.btn_buy:
+                new BottomSheet.Builder(ProductDetail.this).title("Choose Paying Type").sheet(R.menu.menu).listener(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case R.id.mPaisa:
+                                Toast.makeText(ProductDetail.this, "help me", Toast.LENGTH_LONG).show();
+                                break;
+                        }
+                    }
+                }).show();
 
             case R.id.btn_cart:
-                if (!addToCart){
-                    addToCart = true;
-                    btnAdd2Cart.setBackgroundColor(Color.RED);
-                }else {
-                    btnAdd2Cart.setBackgroundColor(Color.LTGRAY);
-                    addToCart = false;
-                }
+                buttonCart();
+
                 break;
 
             case R.id.btn_wish:
+
                 if (!wish){
+
                     wish = true;
-                    btnAdd2Wishlist.setBackgroundColor(Color.RED);
+                    btnAdd2Wishlist.setBackgroundResource(android.R.drawable.star_big_on);
+                    addToWishlist(pId);
+
                 }else {
-                    btnAdd2Wishlist.setBackgroundColor(Color.LTGRAY);
+
+                    btnAdd2Wishlist.setBackgroundResource(android.R.drawable.star_big_off);
                     wish = false;
+                    removeFromWishlist(pId);
                 }
                 break;
         }
@@ -128,6 +146,91 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void addToWishlist(String pId){
+
+        client = new ProductClient();
+        client.addToWishlist(pId, new Helper().getToken(ProductDetail.this), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("add_to wishlist", response.toString());
+                Toast.makeText(ProductDetail.this, "Succesfully added to your wishlist", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+    }
+
+    public void removeFromWishlist(String pId){
+        client = new ProductClient();
+
+        client.removeFromWishlist(pId, new Helper().getToken(ProductDetail.this), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                Toast.makeText(ProductDetail.this, "Succesfully removed from your wishlist", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
+    }
+
+    public void addToCart(String pId){
+
+        client = new ProductClient();
+        client.addToCart(pId, new Helper().getToken(ProductDetail.this), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("add_to wishlist", response.toString());
+                Toast.makeText(ProductDetail.this, "Successfully added to your carts", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+            }
+        });
+    }
+
+    public void removeFromCart(String pId){
+        client = new ProductClient();
+
+        client.removeFromCart(pId, new Helper().getToken(ProductDetail.this), new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+
+                Toast.makeText(ProductDetail.this, "Successfully removed from your carts", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
+    }
+
+    public void buttonCart(){
+        if (activity.equals("Cart")){
+            btnAdd2Cart.setText("Remove from Cart");
+            removeFromCart(pId);
+        }
+        else if(activity.equals("Wishlist")){
+            addToCart(pId);
+        }
+        else {
+            addToCart(pId);
         }
     }
 }

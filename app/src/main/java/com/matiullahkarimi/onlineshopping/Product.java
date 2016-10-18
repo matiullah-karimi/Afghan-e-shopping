@@ -11,6 +11,7 @@ import java.util.ArrayList;
  * Created by Matiullah Karimi on 10/11/2016.
  */
 public class Product {
+    private String id;
     private String name;
     private String image;
     private String price;
@@ -18,7 +19,8 @@ public class Product {
 
     public Product(){}
 
-    public Product(String name, String image, String price, String description) {
+    public Product(String id, String name, String image, String price, String description) {
+        this.id = id;
         this.name = name;
         this.image = image;
         this.price = price;
@@ -55,5 +57,13 @@ public class Product {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
