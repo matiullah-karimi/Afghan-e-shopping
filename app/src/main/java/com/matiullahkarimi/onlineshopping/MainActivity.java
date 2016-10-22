@@ -84,7 +84,9 @@ public class MainActivity extends AppCompatActivity
 
         // swipe to referesh
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setEnabled(false);
         swipeRefreshLayout.setOnRefreshListener(this);
+
 
         /**
          * Showing Swipe Refresh animation on activity create
@@ -105,12 +107,17 @@ public class MainActivity extends AppCompatActivity
         txtNoInternet = (TextView) findViewById(R.id.no_internet);
         recyclerView = (RecyclerView) findViewById(R.id.recycler);
 
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
         // helper class
         helper = new Helper();
 
         // checking the internet connection
         if (!helper.isNetworkAvailable(this)){
             helper.toast(this, "No Internet Connection");
+            swipeRefreshLayout.setRefreshing(true);
             recyclerView.setVisibility(View.GONE);
             btnRetry.setVisibility(View.VISIBLE);
             txtNoInternet.setVisibility(View.VISIBLE);
@@ -178,6 +185,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
@@ -193,8 +202,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_refresh) {
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+            finish();
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -229,7 +240,10 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, About.class);
             startActivity(intent);
         } else if (id == R.id.nav_logout) {
-
+            SessionManager manager = new SessionManager(MainActivity.this);
+            manager.logoutUser();
+            Intent intent = new Intent(MainActivity.this, Login.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -264,10 +278,9 @@ public class MainActivity extends AppCompatActivity
 
                     final RecyclerAdapter adapter = new RecyclerAdapter(MainActivity.this, names);
                     recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
 
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(MainActivity.this, 2);
-                    recyclerView.setLayoutManager(gridLayoutManager);
-                    recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 
                     recyclerView.addOnItemTouchListener(
                             new RecyclerItemClickListener(MainActivity.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
@@ -322,7 +335,11 @@ public class MainActivity extends AppCompatActivity
                 super.onFailure(statusCode, headers, throwable, errorResponse);
                 swipeRefreshLayout.setRefreshing(false);
 
-                helper.hideProgressDialog();
+                try {
+                    helper.hideProgressDialog();
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
                 recyclerView.setVisibility(View.GONE);
                 btnRetry.setVisibility(View.VISIBLE);
                 txtNoInternet.setVisibility(View.VISIBLE);

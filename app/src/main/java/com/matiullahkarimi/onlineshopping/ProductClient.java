@@ -12,8 +12,8 @@ import java.util.HashMap;
  * Created by Matiullah Karimi on 10/14/2016.
  */
 public class ProductClient {
-    private static final String API_BASE_URL = "http://10.19.1.61:8080/api";
-    public static final String IMAGES_BASE_URL = "http://10.19.1.61:8080/img/";
+    private static final String API_BASE_URL = "http://172.30.10.56:8080/api";
+    public static final String IMAGES_BASE_URL = "http://172.30.10.56:8080/img/";
     private AsyncHttpClient client;
 
     public ProductClient() {
@@ -51,8 +51,13 @@ public class ProductClient {
     }
     // get all products
     public void getProducts( JsonHttpResponseHandler handler){
-        String url = getApiUrl("/products");
-        client.get(url,handler);
+        if (new Helper().isUserAuthenticated()){
+            String url = getApiUrl("/user/products");
+            client.get(url, handler);
+        }else{
+             String url = getApiUrl("/products");
+             client.get(url,handler);
+             }
     }
 
     // add a product to wishlist
@@ -84,9 +89,27 @@ public class ProductClient {
         client.get(url, handler);
     }
 
+    // remove from carts
     public void removeFromCart(String pId, String token, JsonHttpResponseHandler handler){
         String url = getApiUrl("/removeFromCart/"+pId+"?token="+token);
         client.post(url, handler);
     }
+
+    // products for men
+    public void category(String cat, JsonHttpResponseHandler handler){
+        String url;
+        if (cat.equals("men")){
+            url = getApiUrl("/men");
+        }
+        else if(cat.equals("women")){
+            url = getApiUrl("/women");
+        }
+        else {
+            url = getApiUrl("/kid");
+        }
+
+        client.get(url, handler);
+    }
+
 
 }

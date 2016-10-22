@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/mPaisa" android:title="M Paisa"
-        android:icon="@android:drawable/presence_away"/>
-    <item android:id="@+id/paypal" android:title="Paypal"
-        android:icon="@android:drawable/presence_audio_online"/>
+        android:icon="@drawable/mpaisa"/>
+    <item android:id="@+id/paypal" android:title="Credit Card"
+        android:enabled="false"
+        android:icon="@drawable/mastercard"/>
 </menu>

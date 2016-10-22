@@ -2,12 +2,14 @@ package com.matiullahkarimi.onlineshopping;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -45,6 +47,8 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
     private ProductClient client;
     private String pId;
     private String activity;
+    private SessionManager sessionManager;
+    String name;
 
 
     @Override
@@ -69,30 +73,41 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
 
         // getting the select view position
         pId = getIntent().getStringExtra("id");
-        String name = getIntent().getStringExtra("name");
+        name = getIntent().getStringExtra("name");
         String price = getIntent().getStringExtra("price");
         String image = getIntent().getStringExtra("image");
         String description = getIntent().getStringExtra("description");
         activity = getIntent().getStringExtra("activity");
-        Log.d("computer", activity);
         // setting values to views
-       // pImage.setImageResource(dataList.get(position).getImage());
         pName.setText(name);
         pPrice.setText(price);
         pDesc.setText(description);
         Picasso.with(ProductDetail.this).load(Uri.parse(ProductClient.IMAGES_BASE_URL+image)).error(R.drawable.avatar).into(pImage);
 
 
+        sessionManager = new SessionManager(ProductDetail.this);
+        if (sessionManager.isLoggedIn()){
+            btnAdd2Wishlist.setVisibility(View.VISIBLE);
+            btnBuy.setVisibility(View.VISIBLE);
+            btnAdd2Cart.setVisibility(View.VISIBLE);
+        }else {
+            btnAdd2Wishlist.setVisibility(View.GONE);
+            btnBuy.setVisibility(View.GONE);
+            btnAdd2Cart.setVisibility(View.GONE);
+        }
+
         // initial value of wish boolean
         wish = false;
         addToCart = false;
-
-        buttonCart();
 
         // registering views to listeners
         btnBuy.setOnClickListener(this);
         btnAdd2Cart.setOnClickListener(this);
         btnAdd2Wishlist.setOnClickListener(this);
+
+        if (activity.equals("Cart")){
+            btnAdd2Cart.setText("Remove from Cart");
+        }
     }
     @Override
     public void onBackPressed() {
@@ -109,11 +124,13 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
                     public void onClick(DialogInterface dialog, int which) {
                         switch (which) {
                             case R.id.mPaisa:
-                                Toast.makeText(ProductDetail.this, "help me", Toast.LENGTH_LONG).show();
+                                OrderDialog orderDialog = new OrderDialog();
+                                orderDialog.show(getFragmentManager(),"Fragment");
                                 break;
                         }
                     }
                 }).show();
+                break;
 
             case R.id.btn_cart:
                 buttonCart();
