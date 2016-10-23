@@ -31,4 +31,18 @@
         satin evening and formal dresses. The fiber used for the fabric of your dress will largely
         determine how you should care for it.
         This guide will help you to clean your satin dress properly and retain its versatility for years to come.</string>
+
+    <array name="colors">
+        <item>Red</item>
+        <item>White</item>
+        <item>Black</item>
+        <item>Blue</item>
+    </array>
+
+    <array name="sizes">
+        <item>Large</item>
+        <item>Medium</item>
+        <item>Small</item>
+    </array>
+
 </resources>
