@@ -40,15 +40,18 @@ public class Register extends AppCompatActivity {
         editEmail = (EditText) findViewById(R.id.email_edit);
         editPassword = (EditText) findViewById(R.id.password_edit);
         
-        final String name = editName.getText().toString();
-        final String email = editEmail.getText().toString();
-        final String password = editPassword.getText().toString();
+
         
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(helper.isNetworkAvailable(Register.this)){
+
+                    String name = editName.getText().toString();
+                    String email = editEmail.getText().toString();
+                    String password = editPassword.getText().toString();
+
                     register(name, email, password);
                 }
                 else {

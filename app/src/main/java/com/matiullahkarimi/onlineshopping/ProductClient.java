@@ -12,8 +12,8 @@ import java.util.HashMap;
  * Created by Matiullah Karimi on 10/14/2016.
  */
 public class ProductClient {
-    private static final String API_BASE_URL = "http://172.30.10.56:8080/api";
-    public static final String IMAGES_BASE_URL = "http://172.30.10.56:8080/img/";
+    private static final String API_BASE_URL = "http://172.30.10.81:8080/api";
+    public static final String IMAGES_BASE_URL = "http://172.30.10.81:8080/img/";
     private AsyncHttpClient client;
 
     public ProductClient() {
@@ -29,9 +29,9 @@ public class ProductClient {
 
         HashMap<String, String> params = new HashMap<>();
 
+        params.put("password",password);
         params.put("name", name);
         params.put("email", email);
-        params.put("password",password);
 
         RequestParams requestParams = new RequestParams(params);
 

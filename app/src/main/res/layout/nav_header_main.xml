@@ -15,13 +15,13 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="80dp"
-        android:src="@drawable/arab" />
+        android:src="@drawable/girl3" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="Al Arabi"
+        android:text="Khakho"
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
@@ -29,7 +29,7 @@
         android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="arab@gmail.com"
+        android:text="khakho@gmail.com"
         android:textAlignment="center"/>
 
 </LinearLayout>
