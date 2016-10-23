@@ -111,5 +111,12 @@ public class ProductClient {
         client.get(url, handler);
     }
 
+    // search for product
+    public void getSearchedProducts(String query, JsonHttpResponseHandler handler){
+        String url = getApiUrl("/search?keyword="+query);
+        client.get(url, handler);
+
+    }
+
 
 }

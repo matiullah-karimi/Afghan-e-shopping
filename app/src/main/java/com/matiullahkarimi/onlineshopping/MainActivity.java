@@ -189,8 +189,30 @@ public class MainActivity extends AppCompatActivity
 
         // Retrieve the SearchView and plug it into SearchManager
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
+        final MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchManager searchManager = (SearchManager) getSystemService(SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                helper.showProgressBar(MainActivity.this, "Loading...");
+                searchProducts(query);
+
+                searchView.setQuery(query, false);
+                searchView.setIconified(true);
+                searchItem.collapseActionView();
+                // Set activity title to search query
+                MainActivity.this.setTitle(query);
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         return true;
     }
 
@@ -265,6 +287,113 @@ public class MainActivity extends AppCompatActivity
 
                 try {
                     JSONArray products = response.getJSONArray("products");
+                    final ArrayList<Product> names = new ArrayList<Product>();
+                    for(int i=0; i<products.length(); i++){
+                        JSONObject inner = products.getJSONObject(i);
+                        String id = inner.getString("id");
+                        String name = inner.getString("title");
+                        String image = inner.getString("imagePath");
+                        String price = inner.getString("price");
+                        String description = inner.getString("description");
+                        names.add(new Product(id, name, image, price, description));
+                    }
+
+                    final RecyclerAdapter adapter = new RecyclerAdapter(MainActivity.this, names);
+                    recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+
+
+
+                    recyclerView.addOnItemTouchListener(
+                            new RecyclerItemClickListener(MainActivity.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                                @Override public void onItemClick(View view, int position) {
+
+                                    Intent intent = new Intent(MainActivity.this, ProductDetail.class);
+                                    intent.putExtra("id", names.get(position).getId());
+                                    intent.putExtra("name", names.get(position).getName());
+                                    intent.putExtra("price", names.get(position).getPrice());
+                                    intent.putExtra("image", names.get(position).getImage());
+                                    intent.putExtra("description", names.get(position).getDescription());
+                                    intent.putExtra("position", position);
+                                    intent.putExtra("activity", "MainActivity");
+                                    ActivityTransitionLauncher.with(MainActivity.this).from(view).launch(intent);
+
+                                }
+                                @Override public void onLongItemClick(View view, int position) {
+                                    Toast.makeText(MainActivity.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
+                                }
+                            })
+                    );
+
+
+                } catch (JSONException e) {
+                    // Invalid JSON format, show appropriate error.
+                    e.printStackTrace();
+                }
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                Log.d("responsemessage",throwable.toString());
+                swipeRefreshLayout.setRefreshing(false);
+
+                helper.hideProgressDialog();
+                recyclerView.setVisibility(View.GONE);
+                btnRetry.setVisibility(View.VISIBLE);
+                txtNoInternet.setVisibility(View.VISIBLE);
+                txtNoInternet.setText("Unable to connect to the server");
+                btnRetry.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        finish();
+                        startActivity(intent);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                super.onFailure(statusCode, headers, throwable, errorResponse);
+                swipeRefreshLayout.setRefreshing(false);
+
+                try {
+                    helper.hideProgressDialog();
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
+                recyclerView.setVisibility(View.GONE);
+                btnRetry.setVisibility(View.VISIBLE);
+                txtNoInternet.setVisibility(View.VISIBLE);
+                txtNoInternet.setText("Unable to connect to the server");
+                btnRetry.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        finish();
+                        startActivity(intent);
+                    }
+                });
+            }
+        });
+    }
+    private void searchProducts(String query) {
+
+        swipeRefreshLayout.setRefreshing(true);
+        client = new ProductClient();
+
+        client.getSearchedProducts(query, new JsonHttpResponseHandler() {
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d("response", response.toString());
+                swipeRefreshLayout.setRefreshing(false);
+
+                helper.hideProgressDialog();
+
+                try {
+                    JSONArray products = response.getJSONArray("results");
+                    if (products.length()==0){
+                        helper.toast(MainActivity.this,"No Job Found!!!");
+                    }
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
