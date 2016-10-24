@@ -5,6 +5,7 @@ import android.app.LocalActivityManager;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -50,6 +51,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
@@ -484,5 +486,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
 
 }

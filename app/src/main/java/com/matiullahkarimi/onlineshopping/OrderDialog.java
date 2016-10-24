@@ -8,7 +8,17 @@ import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.Toast;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Karimi on 10/22/2016.
@@ -22,8 +32,18 @@ public class OrderDialog extends DialogFragment {
 
         View modifyView = inflater.inflate(R.layout.custom_dialog, null);
 
-            Spinner colorSpinner = (Spinner) modifyView.findViewById(R.id.spinner_color);
-            Spinner sizeSpinner = (Spinner) modifyView.findViewById(R.id.spinner_size);
+        // initializing views
+        final NumberPicker numberPicker = (NumberPicker) modifyView.findViewById(R.id.amount);
+        numberPicker.setMinValue(0);
+        numberPicker.setMaxValue(20);
+        numberPicker.setWrapSelectorWheel(true);
+
+        final EditText numberEdit = (EditText) modifyView.findViewById(R.id.contact_number);
+        final EditText addressEdit = (EditText) modifyView.findViewById(R.id.address);
+
+
+            final Spinner colorSpinner = (Spinner) modifyView.findViewById(R.id.spinner_color);
+            final Spinner sizeSpinner = (Spinner) modifyView.findViewById(R.id.spinner_size);
 
             // Create an ArrayAdapter using the string array and a default spinner layout
             ArrayAdapter<CharSequence> colorAdapter = ArrayAdapter.createFromResource(getActivity(),
@@ -48,7 +68,33 @@ public class OrderDialog extends DialogFragment {
                 .setPositiveButton("Order", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
+                        String amount = Integer.toString(numberPicker.getValue());
+                        String color = colorSpinner.getSelectedItem().toString();
+                        String size = sizeSpinner.getSelectedItem().toString();
+                        String address = addressEdit.getText().toString();
+                        String contactNumber = numberEdit.getText().toString();
+                        String pId = getArguments().getString("pId");
+
+                        ProductClient client = new ProductClient();
+                        client.order(pId, amount, color, size, address, contactNumber, new Helper().getToken(getActivity()),
+                                new JsonHttpResponseHandler(){
+                            @Override
+                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                super.onSuccess(statusCode, headers, response);
+
+                                try {
+                                    Toast.makeText(getActivity(), response.getString("message"), Toast.LENGTH_LONG).show();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                super.onFailure(statusCode, headers, responseString, throwable);
+                                new Helper().toast(getActivity(), "Something went wrong!!!");
+                            }
+                        });
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

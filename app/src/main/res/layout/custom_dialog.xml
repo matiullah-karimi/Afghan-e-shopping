@@ -9,16 +9,20 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="Amount"/>
+
     <NumberPicker
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/amount"
+        android:theme="@style/AppTheme.Picker"
+
         />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Choose Color"/>
+        android:text="Choose Color"
+        android:layout_marginTop="20dp"/>
 
     <Spinner
         android:layout_width="match_parent"
@@ -29,7 +33,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Size"/>
+        android:text="Select Size"
+        android:layout_marginTop="20dp"/>
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,6 +46,7 @@
         android:layout_height="wrap_content"
         android:inputType="number"
         android:ems="10"
+        android:layout_marginTop="20dp"
         android:hint="Contact Number"
         android:id="@+id/contact_number" />
 
