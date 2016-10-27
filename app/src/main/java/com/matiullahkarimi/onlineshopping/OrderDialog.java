@@ -2,9 +2,11 @@ package com.matiullahkarimi.onlineshopping;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -67,13 +69,16 @@ public class OrderDialog extends DialogFragment {
                 // Add action buttons
                 .setPositiveButton("Order", new DialogInterface.OnClickListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int id) {
+                    public void onClick(final DialogInterface dialog, int id) {
                         String amount = Integer.toString(numberPicker.getValue());
                         String color = colorSpinner.getSelectedItem().toString();
                         String size = sizeSpinner.getSelectedItem().toString();
                         String address = addressEdit.getText().toString();
                         String contactNumber = numberEdit.getText().toString();
                         String pId = getArguments().getString("pId");
+
+                        Dialog dialogContext  = (Dialog) dialog;
+                        final Context context = dialogContext.getContext();
 
                         ProductClient client = new ProductClient();
                         client.order(pId, amount, color, size, address, contactNumber, new Helper().getToken(getActivity()),
@@ -83,8 +88,11 @@ public class OrderDialog extends DialogFragment {
                                 super.onSuccess(statusCode, headers, response);
 
                                 try {
-                                    Toast.makeText(getActivity(), response.getString("message"), Toast.LENGTH_LONG).show();
-                                } catch (JSONException e) {
+                                    Toast.makeText(context, response.getString("message"), Toast.LENGTH_LONG).show();
+                                    Log.d("sucess", response.getString("message"));
+
+
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }

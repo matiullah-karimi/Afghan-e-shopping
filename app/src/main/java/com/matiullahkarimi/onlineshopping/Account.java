@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class Account extends AppCompatActivity {
 
@@ -19,6 +21,11 @@ public class Account extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        ListView listView = (ListView) findViewById(R.id.listView);
+        String array [] = {"My Orders", "Shopping Address", "My Carts", "My Wishlists", "Contact Number", "Feedback"};
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, R.layout.list, R.id.list_text, array);
+        listView.setAdapter(arrayAdapter);
 
     }
 

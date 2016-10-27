@@ -18,6 +18,7 @@
     </android.support.v4.widget.SwipeRefreshLayout>
     <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tabHost"
+        android:theme="@style/AppTheme"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
         <RelativeLayout
