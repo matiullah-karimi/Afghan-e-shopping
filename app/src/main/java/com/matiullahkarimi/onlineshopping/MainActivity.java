@@ -394,7 +394,7 @@ public class MainActivity extends AppCompatActivity
                 try {
                     JSONArray products = response.getJSONArray("results");
                     if (products.length()==0){
-                        helper.toast(MainActivity.this,"No Job Found!!!");
+                        helper.toast(MainActivity.this,"No Product Found!!!");
                     }
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){

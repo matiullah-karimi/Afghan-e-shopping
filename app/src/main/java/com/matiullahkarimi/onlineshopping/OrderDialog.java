@@ -34,9 +34,10 @@ public class OrderDialog extends DialogFragment {
 
         View modifyView = inflater.inflate(R.layout.custom_dialog, null);
 
+        builder.setTitle("Ordering product...");
         // initializing views
         final NumberPicker numberPicker = (NumberPicker) modifyView.findViewById(R.id.amount);
-        numberPicker.setMinValue(0);
+        numberPicker.setMinValue(1);
         numberPicker.setMaxValue(20);
         numberPicker.setWrapSelectorWheel(true);
 
@@ -80,29 +81,38 @@ public class OrderDialog extends DialogFragment {
                         Dialog dialogContext  = (Dialog) dialog;
                         final Context context = dialogContext.getContext();
 
-                        ProductClient client = new ProductClient();
-                        client.order(pId, amount, color, size, address, contactNumber, new Helper().getToken(getActivity()),
-                                new JsonHttpResponseHandler(){
-                            @Override
-                            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                super.onSuccess(statusCode, headers, response);
+                        // validating edit texts
+                        if (contactNumber.equals("")){
+                            numberEdit.setError("Contact number field is required");
+                        }
+                        else if (address.equals("")){
+                            addressEdit.setError("address field is required");
+                        }else {
+                            ProductClient client = new ProductClient();
+                            client.order(pId, amount, color, size, address, contactNumber, new Helper().getToken(getActivity()),
+                                    new JsonHttpResponseHandler(){
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                            super.onSuccess(statusCode, headers, response);
 
-                                try {
-                                    Toast.makeText(context, response.getString("message"), Toast.LENGTH_LONG).show();
-                                    Log.d("sucess", response.getString("message"));
+                                            try {
+                                                Toast.makeText(context, response.getString("message"), Toast.LENGTH_LONG).show();
+                                                Log.d("sucess", response.getString("message"));
 
 
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
 
-                            @Override
-                            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                                super.onFailure(statusCode, headers, responseString, throwable);
-                                new Helper().toast(getActivity(), "Something went wrong!!!");
-                            }
-                        });
+                                        @Override
+                                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                            super.onFailure(statusCode, headers, responseString, throwable);
+                                            new Helper().toast(getActivity(), "Something went wrong!!!");
+                                        }
+                                    });
+                        }
+
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

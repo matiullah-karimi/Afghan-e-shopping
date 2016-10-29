@@ -14,8 +14,8 @@ import java.util.HashMap;
  * Created by Matiullah Karimi on 10/14/2016.
  */
 public class ProductClient {
-    private static final String API_BASE_URL = "http://172.30.10.81:8080/api";
-    public static final String IMAGES_BASE_URL = "http://172.30.10.81:8080/img/";
+    private static final String API_BASE_URL = "http://172.30.10.186:8080/api";
+    public static final String IMAGES_BASE_URL = "http://172.30.10.186:8080/img/";
     private AsyncHttpClient client;
 
     public ProductClient() {
@@ -134,5 +134,10 @@ public class ProductClient {
         RequestParams params = new RequestParams(param);
 
         client.post(url, params, handler);
+    }
+
+    public void myOrders(String token, JsonHttpResponseHandler handler){
+        String url = getApiUrl("/orders?token="+token);
+        client.get(url,handler);
     }
 }
