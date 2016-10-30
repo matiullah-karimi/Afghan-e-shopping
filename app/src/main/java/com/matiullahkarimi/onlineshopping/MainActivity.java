@@ -200,21 +200,9 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            if (helper.isNetworkAvailable(MainActivity.this)) {
-                fetchProducts();
-            }else {
-                recyclerView.setVisibility(View.GONE);
-                btnRetry.setVisibility(View.VISIBLE);
-                txtNoInternet.setVisibility(View.VISIBLE);
-                btnRetry.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
-                        finish();
-                        startActivity(intent);
-                    }
-                });
-            }
+            Intent intent = new Intent(MainActivity.this, MainActivity.class);
+            finish();
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
