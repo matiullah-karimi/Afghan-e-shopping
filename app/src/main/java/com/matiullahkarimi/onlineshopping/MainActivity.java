@@ -57,14 +57,13 @@ import java.util.ArrayList;
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener{
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     private ProductClient client;
     private Helper helper;
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
-    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,25 +83,6 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // swipe to referesh
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setEnabled(false);
-        swipeRefreshLayout.setOnRefreshListener(this);
-
-
-        /**
-         * Showing Swipe Refresh animation on activity create
-         * As animation won't start on onCreate, post runnable is used
-         */
-        swipeRefreshLayout.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        swipeRefreshLayout.setRefreshing(true);
-
-                                        fetchProducts();
-                                    }
-                                }
-        );
 
         // initializing views
         btnRetry = (Button) findViewById(R.id.btn_retry);
@@ -119,7 +99,6 @@ public class MainActivity extends AppCompatActivity
         // checking the internet connection
         if (!helper.isNetworkAvailable(this)){
             helper.toast(this, "No Internet Connection");
-            swipeRefreshLayout.setRefreshing(true);
             recyclerView.setVisibility(View.GONE);
             btnRetry.setVisibility(View.VISIBLE);
             txtNoInternet.setVisibility(View.VISIBLE);
@@ -178,10 +157,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void onRefresh() {
-        fetchProducts();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -227,9 +202,21 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            Intent intent = new Intent(MainActivity.this, MainActivity.class);
-            finish();
-            startActivity(intent);
+            if (helper.isNetworkAvailable(MainActivity.this)) {
+                fetchProducts();
+            }else {
+                recyclerView.setVisibility(View.GONE);
+                btnRetry.setVisibility(View.VISIBLE);
+                txtNoInternet.setVisibility(View.VISIBLE);
+                btnRetry.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        finish();
+                        startActivity(intent);
+                    }
+                });
+            }
         }
 
         return super.onOptionsItemSelected(item);
@@ -277,13 +264,12 @@ public class MainActivity extends AppCompatActivity
 
     private void fetchProducts() {
 
-        swipeRefreshLayout.setRefreshing(true);
+        helper.showProgressBar(MainActivity.this,"Loading...");
         client = new ProductClient();
 
         client.getProducts(new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
-                swipeRefreshLayout.setRefreshing(false);
 
                 helper.hideProgressDialog();
 
@@ -337,7 +323,6 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
                 Log.d("responsemessage",throwable.toString());
-                swipeRefreshLayout.setRefreshing(false);
 
                 helper.hideProgressDialog();
                 recyclerView.setVisibility(View.GONE);
@@ -357,7 +342,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                swipeRefreshLayout.setRefreshing(false);
 
                 try {
                     helper.hideProgressDialog();
@@ -381,14 +365,11 @@ public class MainActivity extends AppCompatActivity
     }
     private void searchProducts(String query) {
 
-        swipeRefreshLayout.setRefreshing(true);
         client = new ProductClient();
 
         client.getSearchedProducts(query, new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
-                swipeRefreshLayout.setRefreshing(false);
-
                 helper.hideProgressDialog();
 
                 try {
@@ -444,7 +425,6 @@ public class MainActivity extends AppCompatActivity
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
                 Log.d("responsemessage",throwable.toString());
-                swipeRefreshLayout.setRefreshing(false);
 
                 helper.hideProgressDialog();
                 recyclerView.setVisibility(View.GONE);
@@ -464,8 +444,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
-                swipeRefreshLayout.setRefreshing(false);
-
                 try {
                     helper.hideProgressDialog();
                 }catch (Exception ex){
