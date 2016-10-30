@@ -73,15 +73,14 @@ public class Wishlist extends AppCompatActivity {
                 }
             });
         } else {
-            // show progress bar
-            helper.showProgressBar(this, "Loading...");
             // calling method fetchProducts()
             fetchProducts();
         }
     }
 
-    private void fetchProducts() {
-
+    public void fetchProducts() {
+        // show progress bar
+        helper.showProgressBar(this, "Loading...");
         client = new ProductClient();
         client.wishlists(helper.getToken(Wishlist.this), new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -176,14 +175,32 @@ public class Wishlist extends AppCompatActivity {
         });
     }
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_refresh) {
+            if (helper.isNetworkAvailable(Wishlist.this)) {
+                fetchProducts();
+                new Wishlist().fetchProducts();
+            }else {
+                recyclerView.setVisibility(View.GONE);
+                btnRetry.setVisibility(View.VISIBLE);
+                txtNoInternet.setVisibility(View.VISIBLE);
+                btnRetry.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Wishlist.this, Wishlist.class);
+                        finish();
+                        startActivity(intent);
+                    }
+                });
+            }
         }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 

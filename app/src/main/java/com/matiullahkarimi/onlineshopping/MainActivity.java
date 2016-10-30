@@ -112,8 +112,6 @@ public class MainActivity extends AppCompatActivity
             });
         }
         else {
-            // show progress bar
-            helper.showProgressBar(this, "Loading...");
             // calling method fetchProducts()
             fetchProducts();
         }
