@@ -28,6 +28,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -108,6 +109,10 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
         if (activity.equals("Cart")){
             btnAdd2Cart.setText("Remove from Cart");
         }
+        else if(activity.equals("Wishlist")){
+            btnAdd2Wishlist.setBackgroundResource(android.R.drawable.star_big_on);
+            wish = true;
+        }
     }
     @Override
     public void onBackPressed() {
@@ -125,6 +130,11 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
                         switch (which) {
                             case R.id.mPaisa:
                                 OrderDialog orderDialog = new OrderDialog();
+
+                                Bundle bundle = new Bundle();
+                                bundle.putString("pId", pId);
+                                orderDialog.setArguments(bundle);
+
                                 orderDialog.show(getFragmentManager(),"Fragment");
                                 break;
                         }
@@ -173,8 +183,13 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Log.d("add_to wishlist", response.toString());
-                Toast.makeText(ProductDetail.this, "Succesfully added to your wishlist", Toast.LENGTH_LONG).show();
+                try {
+                    String message = response.getString("message");
+                    Toast.makeText(ProductDetail.this, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
             }
 
             @Override
@@ -191,8 +206,13 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                try {
+                    String message = response.getString("message");
+                    Toast.makeText(ProductDetail.this, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                Toast.makeText(ProductDetail.this, "Succesfully removed from your wishlist", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -210,7 +230,12 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 Log.d("add_to wishlist", response.toString());
-                Toast.makeText(ProductDetail.this, "Successfully added to your carts", Toast.LENGTH_LONG).show();
+                try {
+                    String message = response.getString("message");
+                    Toast.makeText(ProductDetail.this, message, Toast.LENGTH_LONG).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
@@ -228,7 +253,14 @@ public class ProductDetail extends AppCompatActivity implements View.OnClickList
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
 
-                Toast.makeText(ProductDetail.this, "Successfully removed from your carts", Toast.LENGTH_LONG).show();
+                String message = null;
+                try {
+                    message = response.getString("message");
+                    Toast.makeText(ProductDetail.this, message, Toast.LENGTH_LONG).show();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
