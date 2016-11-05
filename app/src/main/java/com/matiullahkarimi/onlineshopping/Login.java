@@ -397,7 +397,9 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
                 if (response.has("token")){
                     try {
                         String token = response.getString("token");
-                        sessionManager.createLoginSession(email, token);
+                        String username = response.getString("name");
+                        String userEmail = response.getString("email");
+                        sessionManager.createLoginSession(username, userEmail, token);
 
                         showProgress(false);
 

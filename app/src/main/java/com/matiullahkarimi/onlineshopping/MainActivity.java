@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -69,7 +70,7 @@ public class MainActivity extends AppCompatActivity
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
-
+    private SessionManager sessionManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +101,23 @@ public class MainActivity extends AppCompatActivity
 
         // helper class
         helper = new Helper();
+        sessionManager = new SessionManager(this);
+
+        // checking for authenticated user
+        if(sessionManager.isLoggedIn()){
+            HashMap<String,String> user = sessionManager.getUserDetails();
+            String username = user.get(sessionManager.KEY_NAME);
+            String userEmail = user.get(sessionManager.KEY_EMAIL);
+
+            Toast.makeText(getApplicationContext(),username,Toast.LENGTH_LONG).show();
+            View header = navigationView.getHeaderView(0);
+
+            TextView authUsername = (TextView) header.findViewById(R.id.auth_user_name);
+            authUsername.setText(username);
+
+            TextView authEmail = (TextView) header.findViewById(R.id.auth_user_email);
+            authEmail.setText(userEmail);
+        }
 
         // checking the internet connection
         if (!helper.isNetworkAvailable(this)){

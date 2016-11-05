@@ -24,6 +24,7 @@
             android:layout_width="150dp"
             android:layout_height="100dp"
             android:src="@drawable/girl3"
+            android:id="@+id/account_profile_pic"
             android:layout_gravity="center_vertical"/>
 
         <LinearLayout
@@ -36,11 +37,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Khakho"/>
+                android:id="@+id/account_username"
+                android:text="Online Shopping"/>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="khakho@gmail.com"/>
+                android:id="@+id/account_useremail"
+                android:text="afghan@gmail.com"/>
         </LinearLayout>
         <TextView
             android:layout_width="wrap_content"
@@ -49,6 +52,7 @@
             android:textStyle="italic"
             android:textColor="@color/colorPrimary"
             android:layout_marginLeft="30dp"
+            android:id="@+id/account_edit"
             android:layout_gravity="center_vertical"/>
 
     </LinearLayout>
