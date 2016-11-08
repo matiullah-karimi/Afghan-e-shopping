@@ -1,22 +1,39 @@
 package com.matiullahkarimi.onlineshopping;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.NumberPicker;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashMap;
+
+import cz.msebera.android.httpclient.Header;
 
 public class Account extends AppCompatActivity {
 
@@ -36,15 +53,15 @@ public class Account extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         //initializing views
-        textUsername = (TextView) findViewById(R.id.account_useremail);
+        textUsername = (TextView) findViewById(R.id.account_username);
         textEmail = (TextView) findViewById(R.id.account_useremail);
         textEdit = (TextView) findViewById(R.id.account_edit);
         profilePicture = (ImageView) findViewById(R.id.account_profile_pic);
 
         if (sessionManager.isLoggedIn()){
-            HashMap<String,String> user = sessionManager.getUserDetails();
-            String username = user.get(sessionManager.KEY_NAME);
-            String userEmail = user.get(sessionManager.KEY_EMAIL);
+            final HashMap<String,String> user = sessionManager.getUserDetails();
+            final String username = user.get(sessionManager.KEY_NAME);
+            final String userEmail = user.get(sessionManager.KEY_EMAIL);
 
             textUsername.setText(username);
             textEmail.setText(userEmail);
@@ -52,7 +69,61 @@ public class Account extends AppCompatActivity {
             textEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Account.this);
+                    // Get the layout inflater
+                    LayoutInflater inflater = getLayoutInflater();
 
+                    View modifyView = inflater.inflate(R.layout.edit_account, null);
+
+                    builder.setTitle("Edit Account");
+
+
+                    final EditText editUsername = (EditText) modifyView.findViewById(R.id.nameEditText);
+                    editUsername.setText(username);
+                    final EditText editEmail = (EditText) modifyView.findViewById(R.id.emailEditText);
+                    editEmail.setText(userEmail);
+                    final EditText editPassword = (EditText) modifyView.findViewById(R.id.passwordEditText);
+
+                    // Inflate and set the layout for the dialog
+                    // Pass null as the parent view because its going in the dialog layout
+                    builder.setView(modifyView)
+                            // Add action buttons
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(final DialogInterface dialog, int id) {
+                                    String name = editUsername.getText().toString();
+                                    String email = editEmail.getText().toString();
+                                    String password = editPassword.getText().toString();
+
+                                    ProductClient client = new ProductClient();
+                                    client.editAccount(new Helper().getToken(Account.this), name, email, password, new JsonHttpResponseHandler(){
+                                        @Override
+                                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                            super.onSuccess(statusCode, headers, response);
+                                            try {
+                                                String message = response.getString("message");
+                                                Toast.makeText(Account.this, message, Toast.LENGTH_LONG).show();
+                                                sessionManager.logoutUser();
+                                                Intent intent = new Intent(Account.this, Login.class);
+                                                startActivity(intent);
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                                            super.onFailure(statusCode, headers, responseString, throwable);
+                                        }
+                                    });
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    dialog.dismiss();
+                                }
+                            });
+                     builder.create().show();
                 }
             });
 
@@ -115,7 +186,34 @@ public class Account extends AppCompatActivity {
                         startActivity(intent);
                         break;
                     case 3:
-                        // user feedback for application
+                        AlertDialog.Builder builder = new AlertDialog.Builder(Account.this);
+                        // Get the layout inflater
+                        LayoutInflater inflater = getLayoutInflater();
+
+                        View modifyView = inflater.inflate(R.layout.item_feedback, null);
+
+                        builder.setTitle("Feedback");
+
+
+                        final EditText editTitle = (EditText) modifyView.findViewById(R.id.title_feedback);
+                        final EditText editDesc = (EditText) modifyView.findViewById(R.id.description_feedback);
+
+                        // Inflate and set the layout for the dialog
+                        // Pass null as the parent view because its going in the dialog layout
+                        builder.setView(modifyView)
+                                // Add action buttons
+                                .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(final DialogInterface dialog, int id) {
+
+                                    }
+                                })
+                                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builder.create().show();
                         break;
 
             }
