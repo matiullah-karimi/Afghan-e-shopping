@@ -22,6 +22,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -189,7 +191,6 @@ public class Account extends AppCompatActivity {
                         AlertDialog.Builder builder = new AlertDialog.Builder(Account.this);
                         // Get the layout inflater
                         LayoutInflater inflater = getLayoutInflater();
-
                         View modifyView = inflater.inflate(R.layout.item_feedback, null);
 
                         builder.setTitle("Feedback");
@@ -197,6 +198,7 @@ public class Account extends AppCompatActivity {
 
                         final EditText editTitle = (EditText) modifyView.findViewById(R.id.title_feedback);
                         final EditText editDesc = (EditText) modifyView.findViewById(R.id.description_feedback);
+                        final RatingBar ratingBar = (RatingBar) modifyView.findViewById(R.id.ratingBar);
 
                         // Inflate and set the layout for the dialog
                         // Pass null as the parent view because its going in the dialog layout
@@ -205,7 +207,23 @@ public class Account extends AppCompatActivity {
                                 .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(final DialogInterface dialog, int id) {
+                                        String title = editTitle.getText().toString();
+                                        String description = editDesc.getText().toString();
+                                        String rating = Float.toString(ratingBar.getRating());
+                                        new ProductClient().feedback(new Helper().getToken(Account.this), title, description, rating,
+                                                new JsonHttpResponseHandler(){
+                                                    @Override
+                                                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                                                        super.onSuccess(statusCode, headers, response);
 
+                                                        try {
+                                                            Toast.makeText(Account.this, response.getString("message"), Toast.LENGTH_LONG).show();
+                                                        }catch (Exception ex){
+                                                            ex.printStackTrace();
+                                                        }
+
+                                                    }
+                                                });
                                     }
                                 })
                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

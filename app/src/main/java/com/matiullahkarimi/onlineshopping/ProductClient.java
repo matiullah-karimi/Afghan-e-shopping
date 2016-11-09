@@ -14,8 +14,8 @@ import java.util.HashMap;
  * Created by Matiullah Karimi on 10/14/2016.
  */
 public class ProductClient {
-    private static final String API_BASE_URL = "http://192.168.43.74:8080/api";
-    public static final String IMAGES_BASE_URL = "http://192.168.43.74:8080/img/";
+    private static final String API_BASE_URL = "http://172.30.10.153:8080/api";
+    public static final String IMAGES_BASE_URL = "http://172.30.10.153:8080/img/";
     private AsyncHttpClient client;
 
     public ProductClient() {
@@ -136,8 +136,15 @@ public class ProductClient {
         client.post(url, params, handler);
     }
 
+    // user orders
     public void myOrders(String token, JsonHttpResponseHandler handler){
         String url = getApiUrl("/orders?token="+token);
+        client.get(url,handler);
+    }
+
+    // cancel order
+    public void cancelOrder(String token, String pId, JsonHttpResponseHandler handler){
+        String url = getApiUrl("/cancelOrder/"+pId+"?token="+token);
         client.get(url,handler);
     }
 
@@ -152,5 +159,24 @@ public class ProductClient {
 
         client.post(url, params, handler);
     }
+
+    public void feedback(String token, String title, String description, String rating, JsonHttpResponseHandler handler){
+        String url = getApiUrl("/feedback?token="+token);
+        HashMap<String,String> param = new HashMap<>();
+        param.put("title", title);
+        param.put("description", description);
+        param.put("rate", rating);
+        RequestParams params = new RequestParams(param);
+
+        client.post(url, params, handler);
+    }
+
+    // all feedbacks
+    public void feedbacks(JsonHttpResponseHandler handler){
+        String url = getApiUrl("/feedbacks");
+        client.get(url, handler);
+    }
+
+
 
 }

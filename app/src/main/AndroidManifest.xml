@@ -10,7 +10,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -57,6 +60,10 @@
         <activity
             android:name=".MyOrders"
             android:label="@string/title_activity_my_orders"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Feedbacks"
+            android:label="@string/title_activity_feedbacks"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

@@ -258,6 +258,11 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, Login.class);
             startActivity(intent);
         }
+
+        else if (id == R.id.nav_feedbacks) {
+            Intent intent = new Intent(MainActivity.this, Feedbacks.class);
+            startActivity(intent);
+        }
         else if (id == R.id.nav_about) {
             Intent intent = new Intent(MainActivity.this, About.class);
             startActivity(intent);
