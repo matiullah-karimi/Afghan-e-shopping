@@ -5,49 +5,47 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="5dp"
-    card_view:cardCornerRadius="2dp">
+    card_view:cardCornerRadius="2dp"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/pName"
+            android:id="@+id/uName"
             android:text="Product Name"
-            android:textAlignment="center"
             android:textStyle="bold"/>
 
-        <ImageView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:id="@+id/pImage"
-            android:transitionName="profile"
-            android:layout_gravity="center_horizontal" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            android:textAlignment="center">
-
+            <RatingBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="?android:attr/ratingBarStyleIndicator"
+                android:id="@+id/ratingBar"
+                android:isIndicator="true"
+                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/price"
-                android:text="Price: "
-                android:layout_gravity="center_horizontal" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/pPrice"
+                android:id="@+id/date"
                 android:text="4000 AF"
-                android:layout_gravity="center_horizontal" />
+                android:textSize="10sp"
+                android:layout_marginTop="10dp"
+                 />
 
-        </LinearLayout>
-
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:id="@+id/fTitle"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/fDesc"/>
     </LinearLayout>
 
 

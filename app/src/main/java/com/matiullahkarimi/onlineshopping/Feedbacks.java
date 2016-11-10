@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -41,6 +42,9 @@ public class Feedbacks extends AppCompatActivity {
         setContentView(R.layout.activity_feedbacks);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // initializing views
         btnRetry = (Button) findViewById(R.id.btn_retry);
@@ -84,7 +88,7 @@ public class Feedbacks extends AppCompatActivity {
                         names.add(new Product(id, title, username, rate, description));
                     }
 
-                    final RecyclerAdapter adapter = new RecyclerAdapter(Feedbacks.this, names);
+                    final FeedbackAdapter adapter = new FeedbackAdapter(Feedbacks.this, names);
                     recyclerView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
 
@@ -93,16 +97,6 @@ public class Feedbacks extends AppCompatActivity {
                     recyclerView.addOnItemTouchListener(
                             new RecyclerItemClickListener(Feedbacks.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                                 @Override public void onItemClick(View view, int position) {
-
-                                    Intent intent = new Intent(Feedbacks.this, ProductDetail.class);
-                                    intent.putExtra("id", names.get(position).getId());
-                                    intent.putExtra("name", names.get(position).getName());
-                                    intent.putExtra("price", names.get(position).getPrice());
-                                    intent.putExtra("image", names.get(position).getImage());
-                                    intent.putExtra("description", names.get(position).getDescription());
-                                    intent.putExtra("position", position);
-                                    intent.putExtra("activity", "Feedbacks");
-                                    ActivityTransitionLauncher.with(Feedbacks.this).from(view).launch(intent);
 
                                 }
                                 @Override public void onLongItemClick(View view, int position) {
@@ -160,6 +154,17 @@ public class Feedbacks extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }
