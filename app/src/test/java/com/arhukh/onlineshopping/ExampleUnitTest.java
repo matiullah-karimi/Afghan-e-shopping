@@ -1,4 +1,4 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import org.junit.Test;
 

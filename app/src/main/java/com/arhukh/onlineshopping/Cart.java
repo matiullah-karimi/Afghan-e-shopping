@@ -1,21 +1,14 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,23 +24,25 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class MyOrders extends AppCompatActivity {
+public class Cart extends AppCompatActivity {
+
     private ProductClient client;
     private Helper helper;
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
-    private String pId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_my_orders);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.activity_cart);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        try{
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }catch (NullPointerException ex){
+            ex.printStackTrace();
+        }
 
         // initializing views
         btnRetry = (Button) findViewById(R.id.btn_retry);
@@ -66,7 +61,7 @@ public class MyOrders extends AppCompatActivity {
             btnRetry.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(MyOrders.this, MyOrders.class);
+                    Intent intent = new Intent(Cart.this, Cart.class);
                     finish();
                     startActivity(intent);
                 }
@@ -82,14 +77,14 @@ public class MyOrders extends AppCompatActivity {
     private void fetchProducts() {
 
         client = new ProductClient();
-        client.myOrders(helper.getToken(MyOrders.this), new JsonHttpResponseHandler() {
+        client.carts(helper.getToken(Cart.this), new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
 
                 helper.hideProgressDialog();
 
                 try {
-                    JSONArray products = response.getJSONArray("orders");
+                    JSONArray products = response.getJSONArray("carts");
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
@@ -101,22 +96,30 @@ public class MyOrders extends AppCompatActivity {
                         names.add(new Product(id, name, image, price, description));
                     }
 
-                    final RecyclerAdapter adapter = new RecyclerAdapter(MyOrders.this, names);
+                    final RecyclerAdapter adapter = new RecyclerAdapter(Cart.this, names);
                     recyclerView.setAdapter(adapter);
 
-                    LinearLayoutManager gridLayoutManager = new LinearLayoutManager(MyOrders.this);
-                    gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(Cart.this, 2);
                     recyclerView.setLayoutManager(gridLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());
 
                     recyclerView.addOnItemTouchListener(
-                            new RecyclerItemClickListener(MyOrders.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                            new RecyclerItemClickListener(Cart.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                                 @Override public void onItemClick(View view, int position) {
+
+                                    Intent intent = new Intent(Cart.this, ProductDetail.class);
+                                    intent.putExtra("id", names.get(position).getId());
+                                    intent.putExtra("name", names.get(position).getName());
+                                    intent.putExtra("price", names.get(position).getPrice());
+                                    intent.putExtra("image", names.get(position).getImage());
+                                    intent.putExtra("description", names.get(position).getImage());
+                                    intent.putExtra("position", position);
+                                    intent.putExtra("activity", "Cart");
+                                    ActivityTransitionLauncher.with(Cart.this).from(view).launch(intent);
 
                                 }
                                 @Override public void onLongItemClick(View view, int position) {
-                                    registerForContextMenu(view);
-                                    pId = names.get(position).getId();
+                                    Toast.makeText(Cart.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
                                 }
                             })
                     );
@@ -140,7 +143,7 @@ public class MyOrders extends AppCompatActivity {
                 btnRetry.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(MyOrders.this, MyOrders.class);
+                        Intent intent = new Intent(Cart.this, Cart.class);
                         finish();
                         startActivity(intent);
                     }
@@ -159,7 +162,7 @@ public class MyOrders extends AppCompatActivity {
                 btnRetry.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(MyOrders.this, MyOrders.class);
+                        Intent intent = new Intent(Cart.this, Cart.class);
                         finish();
                         startActivity(intent);
                     }
@@ -175,37 +178,6 @@ public class MyOrders extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v,
-                                    ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.context_menu, menu);
-    }
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.cancel:
-                Log.d("product_id", pId);
-                client.cancelOrder(helper.getToken(getApplicationContext()), pId, new JsonHttpResponseHandler(){
-                    @Override
-                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                        super.onSuccess(statusCode, headers, response);
-                        try {
-                            helper.toast(getApplicationContext(), response.getString("message"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        fetchProducts();
-                    }
-                });
-                return true;
-            default:
-                return super.onContextItemSelected(item);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,10 +6,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
 import java.util.HashMap;
-
-/**
- * Created by Matiullah Karimi on 5/30/2016.
- */
 
 public class SessionManager {
     // Shared Preferences

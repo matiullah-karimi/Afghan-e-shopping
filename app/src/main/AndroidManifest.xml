@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.matiullahkarimi.onlineshopping">
+    package="com.arhukh.onlineshopping">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -22,7 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.arhukh.onlineshopping.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -32,37 +32,37 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProductDetail"
+            android:name="com.arhukh.onlineshopping.ProductDetail"
             android:label="@string/title_activity_product_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Account"
+            android:name="com.arhukh.onlineshopping.Account"
             android:label="@string/title_activity_account"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Login"
+            android:name="com.arhukh.onlineshopping.Login"
             android:label="@string/title_activity_login" />
-        <activity android:name=".Message" />
-        <activity android:name=".Wishlist" />
-        <activity android:name=".Cart" />
+        <activity android:name="com.arhukh.onlineshopping.Message" />
+        <activity android:name="com.arhukh.onlineshopping.Wishlist" />
+        <activity android:name="com.arhukh.onlineshopping.Cart" />
         <activity
-            android:name=".ProductCategories"
+            android:name="com.arhukh.onlineshopping.ProductCategories"
             android:label="@string/title_activity_product_categories"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Register"
+            android:name="com.arhukh.onlineshopping.Register"
             android:label="@string/title_activity_register"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".About"
+            android:name="com.arhukh.onlineshopping.About"
             android:label="@string/title_activity_about"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".MyOrders"
+            android:name="com.arhukh.onlineshopping.MyOrders"
             android:label="@string/title_activity_my_orders"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Feedbacks"
+            android:name="com.arhukh.onlineshopping.Feedbacks"
             android:label="@string/title_activity_feedbacks"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>

@@ -1,18 +1,11 @@
-package com.matiullahkarimi.onlineshopping;
-
-import android.os.AsyncTask;
-import android.util.Log;
+package com.arhukh.onlineshopping;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import java.net.URL;
 import java.util.HashMap;
 
-/**
- * Created by Matiullah Karimi on 10/14/2016.
- */
 public class ProductClient {
     private static final String API_BASE_URL = "http://172.30.10.153:8080/api";
     public static final String IMAGES_BASE_URL = "http://172.30.10.153:8080/img/";

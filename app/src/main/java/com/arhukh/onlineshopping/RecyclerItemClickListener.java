@@ -1,15 +1,12 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.view.View;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 
-/**
- * Created by Matiullah Karimi on 10/12/2016.
- */
+
 public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener{
 
     private OnItemClickListener mListener;
