@@ -1,11 +1,4 @@
-package com.matiullahkarimi.onlineshopping;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.security.Policy;
-import java.util.ArrayList;
+package com.arhukh.onlineshopping;
 
 /**
  * Created by Matiullah Karimi on 10/11/2016.

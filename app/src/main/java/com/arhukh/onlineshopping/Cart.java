@@ -1,12 +1,10 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
@@ -22,24 +20,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class Wishlist extends AppCompatActivity {
+public class Cart extends AppCompatActivity {
 
     private ProductClient client;
     private Helper helper;
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
-    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_wishlist);
+        setContentView(R.layout.activity_cart);
 
         try{
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -48,15 +44,13 @@ public class Wishlist extends AppCompatActivity {
             ex.printStackTrace();
         }
 
-
         // initializing views
         btnRetry = (Button) findViewById(R.id.btn_retry);
         txtNoInternet = (TextView) findViewById(R.id.no_internet);
         recyclerView = (RecyclerView) findViewById(R.id.recycler);
 
-        // initiaizing class
+        // helper class
         helper = new Helper();
-        sessionManager = new SessionManager(this);
 
         // checking the internet connection
         if (!helper.isNetworkAvailable(this)) {
@@ -67,29 +61,30 @@ public class Wishlist extends AppCompatActivity {
             btnRetry.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(Wishlist.this, Wishlist.class);
+                    Intent intent = new Intent(Cart.this, Cart.class);
                     finish();
                     startActivity(intent);
                 }
             });
         } else {
+            // show progress bar
+            helper.showProgressBar(this, "Loading...");
             // calling method fetchProducts()
             fetchProducts();
         }
     }
 
-    public void fetchProducts() {
-        // show progress bar
-        helper.showProgressBar(this, "Loading...");
+    private void fetchProducts() {
+
         client = new ProductClient();
-        client.wishlists(helper.getToken(Wishlist.this), new JsonHttpResponseHandler() {
+        client.carts(helper.getToken(Cart.this), new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
 
                 helper.hideProgressDialog();
 
                 try {
-                    JSONArray products = response.getJSONArray("wishlists");
+                    JSONArray products = response.getJSONArray("carts");
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
@@ -101,29 +96,30 @@ public class Wishlist extends AppCompatActivity {
                         names.add(new Product(id, name, image, price, description));
                     }
 
-                    final RecyclerAdapter adapter = new RecyclerAdapter(Wishlist.this, names);
+                    final RecyclerAdapter adapter = new RecyclerAdapter(Cart.this, names);
                     recyclerView.setAdapter(adapter);
 
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(Wishlist.this, 2);
+                    GridLayoutManager gridLayoutManager = new GridLayoutManager(Cart.this, 2);
                     recyclerView.setLayoutManager(gridLayoutManager);
                     recyclerView.setItemAnimator(new DefaultItemAnimator());
 
                     recyclerView.addOnItemTouchListener(
-                            new RecyclerItemClickListener(Wishlist.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                            new RecyclerItemClickListener(Cart.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                                 @Override public void onItemClick(View view, int position) {
 
-                                    Intent intent = new Intent(Wishlist.this, ProductDetail.class);
+                                    Intent intent = new Intent(Cart.this, ProductDetail.class);
                                     intent.putExtra("id", names.get(position).getId());
                                     intent.putExtra("name", names.get(position).getName());
                                     intent.putExtra("price", names.get(position).getPrice());
                                     intent.putExtra("image", names.get(position).getImage());
+                                    intent.putExtra("description", names.get(position).getImage());
                                     intent.putExtra("position", position);
-                                    intent.putExtra("activity", "Wishlist");
-                                    ActivityTransitionLauncher.with(Wishlist.this).from(view).launch(intent);
+                                    intent.putExtra("activity", "Cart");
+                                    ActivityTransitionLauncher.with(Cart.this).from(view).launch(intent);
 
                                 }
                                 @Override public void onLongItemClick(View view, int position) {
-                                    Toast.makeText(Wishlist.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(Cart.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
                                 }
                             })
                     );
@@ -147,7 +143,7 @@ public class Wishlist extends AppCompatActivity {
                 btnRetry.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Wishlist.this, Wishlist.class);
+                        Intent intent = new Intent(Cart.this, Cart.class);
                         finish();
                         startActivity(intent);
                     }
@@ -166,7 +162,7 @@ public class Wishlist extends AppCompatActivity {
                 btnRetry.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Wishlist.this, Wishlist.class);
+                        Intent intent = new Intent(Cart.this, Cart.class);
                         finish();
                         startActivity(intent);
                     }
@@ -175,32 +171,13 @@ public class Wishlist extends AppCompatActivity {
         });
     }
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_refresh) {
-            if (helper.isNetworkAvailable(Wishlist.this)) {
-                fetchProducts();
-                new Wishlist().fetchProducts();
-            }else {
-                recyclerView.setVisibility(View.GONE);
-                btnRetry.setVisibility(View.VISIBLE);
-                txtNoInternet.setVisibility(View.VISIBLE);
-                btnRetry.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Intent intent = new Intent(Wishlist.this, Wishlist.class);
-                        finish();
-                        startActivity(intent);
-                    }
-                });
-            }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }
-

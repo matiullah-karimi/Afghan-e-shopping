@@ -1,28 +1,21 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.content.Context;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
-
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-/**
- * Created by Matiullah Karimi on 10/12/2016.
- */
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyViewHolder> {
+public class FeedbackAdapter extends RecyclerView.Adapter<FeedbackAdapter.MyViewHolder> {
     private List<Product> mData;
     private LayoutInflater mInflator;
     Context context;
 
-    public RecyclerAdapter(Context context, List<Product> data){
+    public FeedbackAdapter(Context context, List<Product> data){
         this.mData = data;
         this.mInflator = LayoutInflater.from(context);
         this.context = context;
@@ -30,7 +23,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = mInflator.inflate(R.layout.item_list, parent, false);
+        View view = mInflator.inflate(R.layout.item_feedbacks, parent, false);
         MyViewHolder holder = new MyViewHolder(view);
 
         return holder;
@@ -50,24 +43,28 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.MyView
 
     class MyViewHolder extends RecyclerView.ViewHolder{
 
-        TextView name, price;
-        ImageView image;
+        TextView name;
+        TextView date, title, desc;
+        RatingBar ratingBar;
         int position;
         Product current;
 
         public MyViewHolder(View itemView) {
             super(itemView);
 
-            name = (TextView) itemView.findViewById(R.id.pName);
-            image = (ImageView) itemView.findViewById(R.id.pImage);
-            price = (TextView) itemView.findViewById(R.id.pPrice);
+            name = (TextView) itemView.findViewById(R.id.uName);
+            ratingBar = (RatingBar) itemView.findViewById(R.id.ratingBar);
+            date = (TextView) itemView.findViewById(R.id.date);
+            title = (TextView) itemView.findViewById(R.id.fTitle);
+            desc = (TextView) itemView.findViewById(R.id.fDesc);
         }
 
         public void setData(Product current, int position) {
-            this.name.setText(current.getName());
-            Picasso.with(context).load(Uri.parse(ProductClient.IMAGES_BASE_URL+current.getImage())).error(R.drawable.avatar).into(this.image);
-            Log.d("curren_image", current.getImage());
-            this.price.setText(current.getPrice());
+            this.name.setText( current.getImage());
+            this.ratingBar.setRating(Float.parseFloat(current.getPrice()));
+            this.date.setText(current.getId());
+            this.title.setText(current.getName());
+            this.desc.setText(current.getDescription());
             this.position = position;
             this.current = current;
         }

@@ -1,13 +1,12 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ThemedSpinnerAdapter;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +14,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kogitune.activity_transition.ActivityTransitionLauncher;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
 import org.json.JSONArray;
@@ -26,102 +24,80 @@ import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class Cart extends AppCompatActivity {
+public class Feedbacks extends AppCompatActivity {
 
     private ProductClient client;
     private Helper helper;
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cart);
+        setContentView(R.layout.activity_feedbacks);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        try{
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }catch (NullPointerException ex){
-            ex.printStackTrace();
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         // initializing views
         btnRetry = (Button) findViewById(R.id.btn_retry);
         txtNoInternet = (TextView) findViewById(R.id.no_internet);
         recyclerView = (RecyclerView) findViewById(R.id.recycler);
 
-        // helper class
+        // initiaizing class
         helper = new Helper();
+        sessionManager = new SessionManager(this);
 
-        // checking the internet connection
-        if (!helper.isNetworkAvailable(this)) {
-            helper.toast(this, "No Internet Connection");
-            recyclerView.setVisibility(View.GONE);
-            btnRetry.setVisibility(View.VISIBLE);
-            txtNoInternet.setVisibility(View.VISIBLE);
-            btnRetry.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(Cart.this, Cart.class);
-                    finish();
-                    startActivity(intent);
-                }
-            });
-        } else {
-            // show progress bar
-            helper.showProgressBar(this, "Loading...");
-            // calling method fetchProducts()
-            fetchProducts();
-        }
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(Feedbacks.this, 1);
+        recyclerView.setLayoutManager(gridLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
+        fetchProducts();
+        
     }
 
     private void fetchProducts() {
 
+        helper.showProgressBar(Feedbacks.this,"Loading...");
         client = new ProductClient();
-        client.carts(helper.getToken(Cart.this), new JsonHttpResponseHandler() {
+
+        client.feedbacks(new JsonHttpResponseHandler() {
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d("response", response.toString());
 
                 helper.hideProgressDialog();
 
                 try {
-                    JSONArray products = response.getJSONArray("carts");
+                    JSONArray products = response.getJSONArray("feedbacks");
                     final ArrayList<Product> names = new ArrayList<Product>();
                     for(int i=0; i<products.length(); i++){
                         JSONObject inner = products.getJSONObject(i);
-                        String id = inner.getString("id");
-                        String name = inner.getString("title");
-                        String image = inner.getString("imagePath");
-                        String price = inner.getString("price");
+                        String id = inner.getString("created_at");
+                        String title = inner.getString("title");
+                        String username = inner.getString("username");
+                        String rate = inner.getString("rate");
                         String description = inner.getString("description");
-                        names.add(new Product(id, name, image, price, description));
+                        names.add(new Product(id, title, username, rate, description));
                     }
 
-                    final RecyclerAdapter adapter = new RecyclerAdapter(Cart.this, names);
+                    final FeedbackAdapter adapter = new FeedbackAdapter(Feedbacks.this, names);
                     recyclerView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
 
-                    GridLayoutManager gridLayoutManager = new GridLayoutManager(Cart.this, 2);
-                    recyclerView.setLayoutManager(gridLayoutManager);
-                    recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 
                     recyclerView.addOnItemTouchListener(
-                            new RecyclerItemClickListener(Cart.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
+                            new RecyclerItemClickListener(Feedbacks.this, recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
                                 @Override public void onItemClick(View view, int position) {
-
-                                    Intent intent = new Intent(Cart.this, ProductDetail.class);
-                                    intent.putExtra("id", names.get(position).getId());
-                                    intent.putExtra("name", names.get(position).getName());
-                                    intent.putExtra("price", names.get(position).getPrice());
-                                    intent.putExtra("image", names.get(position).getImage());
-                                    intent.putExtra("description", names.get(position).getImage());
-                                    intent.putExtra("position", position);
-                                    intent.putExtra("activity", "Cart");
-                                    ActivityTransitionLauncher.with(Cart.this).from(view).launch(intent);
 
                                 }
                                 @Override public void onLongItemClick(View view, int position) {
-                                    Toast.makeText(Cart.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(Feedbacks.this, "Long press on image" + position, Toast.LENGTH_LONG).show();
                                 }
                             })
                     );
@@ -145,7 +121,7 @@ public class Cart extends AppCompatActivity {
                 btnRetry.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Cart.this, Cart.class);
+                        Intent intent = new Intent(Feedbacks.this, Feedbacks.class);
                         finish();
                         startActivity(intent);
                     }
@@ -156,7 +132,11 @@ public class Cart extends AppCompatActivity {
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 super.onFailure(statusCode, headers, throwable, errorResponse);
 
-                helper.hideProgressDialog();
+                try {
+                    helper.hideProgressDialog();
+                }catch (Exception ex){
+                    ex.printStackTrace();
+                }
                 recyclerView.setVisibility(View.GONE);
                 btnRetry.setVisibility(View.VISIBLE);
                 txtNoInternet.setVisibility(View.VISIBLE);
@@ -164,7 +144,7 @@ public class Cart extends AppCompatActivity {
                 btnRetry.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(Cart.this, Cart.class);
+                        Intent intent = new Intent(Feedbacks.this, Feedbacks.class);
                         finish();
                         startActivity(intent);
                     }
@@ -172,6 +152,7 @@ public class Cart extends AppCompatActivity {
             }
         });
     }
+
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -182,4 +163,5 @@ public class Cart extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 }

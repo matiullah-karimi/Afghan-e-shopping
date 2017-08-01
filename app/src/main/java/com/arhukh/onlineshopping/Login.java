@@ -1,4 +1,4 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -14,7 +14,6 @@ import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -397,7 +396,9 @@ public class Login extends AppCompatActivity implements LoaderCallbacks<Cursor> 
                 if (response.has("token")){
                     try {
                         String token = response.getString("token");
-                        sessionManager.createLoginSession(email, token);
+                        String username = response.getString("name");
+                        String userEmail = response.getString("email");
+                        sessionManager.createLoginSession(username, userEmail, token);
 
                         showProgress(false);
 

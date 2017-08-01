@@ -1,28 +1,18 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
-import android.app.ActivityOptions;
 import android.app.LocalActivityManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -36,12 +26,7 @@ import android.view.MenuItem;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,12 +37,9 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -69,7 +51,7 @@ public class MainActivity extends AppCompatActivity
     private Button btnRetry;
     private TextView txtNoInternet;
     private RecyclerView recyclerView;
-
+    private SessionManager sessionManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +82,23 @@ public class MainActivity extends AppCompatActivity
 
         // helper class
         helper = new Helper();
+        sessionManager = new SessionManager(this);
+
+        // checking for authenticated user
+        if(sessionManager.isLoggedIn()){
+            HashMap<String,String> user = sessionManager.getUserDetails();
+            String username = user.get(sessionManager.KEY_NAME);
+            String userEmail = user.get(sessionManager.KEY_EMAIL);
+
+            Toast.makeText(getApplicationContext(),username,Toast.LENGTH_LONG).show();
+            View header = navigationView.getHeaderView(0);
+
+            TextView authUsername = (TextView) header.findViewById(R.id.auth_user_name);
+            authUsername.setText(username);
+
+            TextView authEmail = (TextView) header.findViewById(R.id.auth_user_email);
+            authEmail.setText(userEmail);
+        }
 
         // checking the internet connection
         if (!helper.isNetworkAvailable(this)){
@@ -238,6 +237,11 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         }else if (id == R.id.nav_login){
             Intent intent = new Intent(MainActivity.this, Login.class);
+            startActivity(intent);
+        }
+
+        else if (id == R.id.nav_feedbacks) {
+            Intent intent = new Intent(MainActivity.this, Feedbacks.class);
             startActivity(intent);
         }
         else if (id == R.id.nav_about) {

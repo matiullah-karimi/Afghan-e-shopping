@@ -45,5 +45,6 @@
         <item>Small</item>
     </array>
     <string name="title_activity_my_orders">MyOrders</string>
+    <string name="title_activity_feedbacks">Feedbacks</string>
 
 </resources>

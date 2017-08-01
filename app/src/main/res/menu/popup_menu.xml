@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/item_camera"
+        app:showAsAction="ifRoom|withText"
+        android:title="Take new picture"
+        android:visible="true"/>
+    <item
+        android:id="@+id/item_gallery"
+        app:showAsAction="ifRoom|withText"
+        android:title="Select from gallery"
+        android:visible="true"/>
+
+</menu>

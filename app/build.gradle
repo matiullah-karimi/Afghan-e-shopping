@@ -5,7 +5,7 @@ android {
     buildToolsVersion "24.0.1"
 
     defaultConfig {
-        applicationId "com.matiullahkarimi.onlineshopping"
+        applicationId "com.arhukh.onlineshopping"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1

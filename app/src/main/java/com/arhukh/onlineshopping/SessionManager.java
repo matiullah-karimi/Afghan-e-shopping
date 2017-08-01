@@ -1,4 +1,4 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,10 +6,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 
 import java.util.HashMap;
-
-/**
- * Created by Matiullah Karimi on 5/30/2016.
- */
 
 public class SessionManager {
     // Shared Preferences
@@ -34,7 +30,8 @@ public class SessionManager {
     public static final String KEY_NAME = "username";
 
     // Email address (make variable public to access from outside)
-    public static final String KEY_TOKEN = "password";
+    public static final String KEY_TOKEN = "token";
+    public static final String KEY_EMAIL = "email";
 
     // Constructor
     public SessionManager(Context context){
@@ -46,7 +43,7 @@ public class SessionManager {
     /**
      * Create login session
      * */
-    public void createLoginSession(String username, String token){
+    public void createLoginSession(String username, String email, String token){
         // Storing login value as TRUE
         editor.putBoolean(IS_LOGIN, true);
 
@@ -54,6 +51,9 @@ public class SessionManager {
         editor.putString(KEY_NAME, username);
 
         // Storing email in pref
+        editor.putString(KEY_EMAIL, email);
+
+        // Storing token in pref
         editor.putString(KEY_TOKEN, token);
 
         // commit changes
@@ -91,6 +91,9 @@ public class SessionManager {
         HashMap<String, String> user = new HashMap<String, String>();
         // user name
         user.put(KEY_NAME, pref.getString(KEY_NAME, null));
+
+        // user name
+        user.put(KEY_EMAIL, pref.getString(KEY_EMAIL, null));
 
         // user email id
         user.put(KEY_TOKEN, pref.getString(KEY_TOKEN, null));

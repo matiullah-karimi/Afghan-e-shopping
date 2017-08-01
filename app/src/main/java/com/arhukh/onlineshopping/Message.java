@@ -1,4 +1,4 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

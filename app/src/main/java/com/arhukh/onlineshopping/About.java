@@ -1,4 +1,4 @@
-package com.matiullahkarimi.onlineshopping;
+package com.arhukh.onlineshopping;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
