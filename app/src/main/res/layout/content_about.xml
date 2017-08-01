@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,7 +9,94 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.arhukh.onlineshopping.About"
-    tools:showIn="@layout/activity_about">
+    tools:context="com.matiullahkarimi.onlineshopping.About"
+    tools:showIn="@layout/activity_about"
+    android:orientation="vertical">
 
-</RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="About us"
+        android:id="@+id/textView2"
+        android:layout_marginTop="37dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/imageView2"
+        android:src="@drawable/logo"
+        android:layout_above="@+id/textView3"
+        android:layout_marginBottom="64dp"
+        android:layout_below="@+id/textView2"
+        android:layout_toRightOf="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2"
+        android:layout_gravity="center_horizontal" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Who we are
+
+Afghan e shopping is a leading local online fashion clothing and accessory store over Afghanistan. Focusing on the very latest in affordable fashion styles, both attire and stunning accessories, we feature thousands of the newest product lines, providing maximum choice and convenience to our discerning clientele. We also aim to provide an extensive range of high quality, trendy fashion clothing together with a professional dedicated service to our valued customers from all over the world.
+
+Across thousands of product lines, affordable chic combines with effortless elegance in everything from gorgeous Women's Clothing, Intimate Lingerie, Bags, Women's Shoes, Wigs, Fashion Jewelry and Accessories, and many more fantastic items at affordable prices.
+
+Our goal is always to provide our customers with stunning, high quality fashion products at down to earth prices. DressLily.com offers trending fashion-forward styles, edgy and innovative designs all delivered with a truly class-leading professional service.
+
+Top 5 Reasons to shop with us
+
+Huge range of quality fashion items: Extensive selection of the very latest styles for both clothing and accessories.
+All new, always new: Exciting products showcasing innovative styles are sourced and added daily by our experienced buyers on DressLily.com to give you maximum choice.
+We love fashion as much as you: Our fashion-savvy staff know quality when they see it, ensuring that each item is perfect and ready to wear before it is shipped.
+Buy more, save more: With a world of styles and thousands of products at your finger tips at great prices, your purse will love you as much as your wardrobe.
+Our customers always come first: You always matter to us. Our highly trained CS team is always ready to support you no matter the issue. When you buy from us, the sale is not complete when we ship, it is complete when you are completely satisfied."
+        android:id="@+id/textView3"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="you can contact us by these addresses"
+        android:id="@+id/textView4"
+        android:layout_marginTop="29dp"
+        android:layout_below="@+id/textView3"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Afghan online shopping@gmail.com"
+        android:id="@+id/textView5"
+        android:textColor="#677eee"
+        android:textStyle="bold"
+        android:layout_above="@+id/textView6"
+        android:layout_alignLeft="@+id/textView6"
+        android:layout_alignStart="@+id/textView6" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0799999999"
+        android:id="@+id/textView6"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/imageView2"
+        android:layout_toStartOf="@+id/imageView2"
+        android:layout_marginBottom="51dp"
+        android:textColor="#677eee"
+        android:textStyle="bold"/>
+
+
+</LinearLayout>
